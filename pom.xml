@@ -8,10 +8,10 @@
 		<version>1.0-SNAPSHOT</version>
 		<relativePath>../codemucker-parent/pom.xml</relativePath>
 	</parent>
-	<artifactId>codemucker-test</artifactId>
+	<artifactId>codemucker-jfind</artifactId>
 	<packaging>jar</packaging>
-	<name>org.codemucker - Test (JFinder and JTest)</name>
-	<description>Bucket library to hold a number of often replicated test code snippets</description>
+	<name>org.codemucker - JFind</name>
+	<description>test utlity to help you find your classes based on some arbitrary criteria</description>
 	<properties>
 		<xtend.version>2.2.1</xtend.version>
 	</properties>
@@ -19,7 +19,12 @@
 	<dependencies>
         <dependency>
             <groupId>org.codemucker</groupId>
-            <artifactId>codemucker-annotations</artifactId>
+            <artifactId>codemucker-jtest</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codemucker</groupId>
+            <artifactId>codemucker-jpattern</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
