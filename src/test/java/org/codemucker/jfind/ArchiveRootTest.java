@@ -1,6 +1,6 @@
 package org.codemucker.jfind;
 
-import static org.codemucker.match.Assert.assertThat;
+import static org.codemucker.jmatch.Assert.assertThat;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.codemucker.match.AList;
+import org.codemucker.jmatch.AList;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;

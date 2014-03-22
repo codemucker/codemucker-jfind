@@ -2,10 +2,10 @@ package org.codemucker.jfind.matcher;
 
 import java.lang.annotation.Annotation;
 
-import org.codemucker.match.AbstractNotNullMatcher;
-import org.codemucker.match.Logical;
-import org.codemucker.match.MatchDiagnostics;
-import org.codemucker.match.Matcher;
+import org.codemucker.jmatch.AbstractNotNullMatcher;
+import org.codemucker.jmatch.Logical;
+import org.codemucker.jmatch.MatchDiagnostics;
+import org.codemucker.jmatch.Matcher;
 
 import com.google.common.base.Objects;
 

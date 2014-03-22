@@ -1,15 +1,15 @@
 package org.codemucker.jfind;
 
-import static org.codemucker.match.Assert.assertThat;
-import static org.codemucker.match.Assert.is;
+import static org.codemucker.jmatch.Assert.assertThat;
+import static org.codemucker.jmatch.Assert.is;
 
 import java.io.File;
 import java.util.Collection;
 
 import org.codemucker.jfind.a.TstBeanOne;
 import org.codemucker.jfind.b.TstBeanTwo;
+import org.codemucker.jmatch.AList;
 import org.codemucker.jtest.ProjectFinder;
-import org.codemucker.match.AList;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;

@@ -2,9 +2,9 @@ package org.codemucker.jfind.matcher;
 
 import java.util.regex.Pattern;
 
-import org.codemucker.match.AString;
-import org.codemucker.match.Logical;
-import org.codemucker.match.Matcher;
+import org.codemucker.jmatch.AString;
+import org.codemucker.jmatch.Logical;
+import org.codemucker.jmatch.Matcher;
 
 public class ClassNameMatchers { //extends Logical {
 	

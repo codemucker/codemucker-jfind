@@ -2,8 +2,8 @@ package org.codemucker.jfind.matcher;
 
 import java.lang.annotation.Annotation;
 
-import org.codemucker.match.AbstractNotNullMatcher;
-import org.codemucker.match.MatchDiagnostics;
+import org.codemucker.jmatch.AbstractNotNullMatcher;
+import org.codemucker.jmatch.MatchDiagnostics;
 
 public class ContainsAnnotationsMatcher extends AbstractNotNullMatcher<Class<?>> {
 	private final Class<? extends Annotation>[] annotations;

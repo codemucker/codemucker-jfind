@@ -1,13 +1,13 @@
 package org.codemucker.jfind.matcher;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.codemucker.match.Logical.all;
-import static org.codemucker.match.Logical.any;
-import static org.codemucker.match.Logical.not;
+import static org.codemucker.jmatch.Logical.all;
+import static org.codemucker.jmatch.Logical.any;
+import static org.codemucker.jmatch.Logical.not;
 
 import java.util.Collection;
 
-import org.codemucker.match.Matcher;
+import org.codemucker.jmatch.Matcher;
 
 public final class IncludeExcludeMatcherBuilder<T> {
 

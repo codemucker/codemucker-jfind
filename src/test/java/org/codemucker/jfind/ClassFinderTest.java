@@ -30,7 +30,7 @@ import org.codemucker.jfind.d.TstInner;
 import org.codemucker.jfind.e.TstAnnotation;
 import org.codemucker.jfind.e.TstAnnotationBean;
 import org.codemucker.jfind.matcher.AClass;
-import org.codemucker.match.AString;
+import org.codemucker.jmatch.AString;
 import org.junit.Test;
 
 

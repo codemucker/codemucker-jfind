@@ -2,12 +2,12 @@ package org.codemucker.jfind;
 
 import java.util.List;
 
-import org.codemucker.match.AProperty;
-import org.codemucker.match.AString;
-import org.codemucker.match.AbstractNotNullMatcher;
-import org.codemucker.match.Description;
-import org.codemucker.match.MatchDiagnostics;
-import org.codemucker.match.Matcher;
+import org.codemucker.jmatch.AProperty;
+import org.codemucker.jmatch.AString;
+import org.codemucker.jmatch.AbstractNotNullMatcher;
+import org.codemucker.jmatch.Description;
+import org.codemucker.jmatch.MatchDiagnostics;
+import org.codemucker.jmatch.Matcher;
 
 import com.google.common.collect.Lists;
 

@@ -3,12 +3,12 @@ package org.codemucker.jfind.matcher;
 import java.util.regex.Pattern;
 
 import org.codemucker.jfind.RootResource;
-import org.codemucker.match.AString;
-import org.codemucker.match.AbstractMatcher;
-import org.codemucker.match.Description;
-import org.codemucker.match.Logical;
-import org.codemucker.match.MatchDiagnostics;
-import org.codemucker.match.Matcher;
+import org.codemucker.jmatch.AString;
+import org.codemucker.jmatch.AbstractMatcher;
+import org.codemucker.jmatch.Description;
+import org.codemucker.jmatch.Logical;
+import org.codemucker.jmatch.MatchDiagnostics;
+import org.codemucker.jmatch.Matcher;
 
 import com.google.common.base.Preconditions;
 

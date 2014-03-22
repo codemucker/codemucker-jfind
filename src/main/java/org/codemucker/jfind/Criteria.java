@@ -26,7 +26,7 @@ import org.codemucker.jfind.ClassFinder.FinderMatchedCallback;
 import org.codemucker.jfind.matcher.AClass;
 import org.codemucker.jfind.matcher.IncludeExcludeMatcherBuilder;
 import org.codemucker.jfind.matcher.ResourceMatchers;
-import org.codemucker.match.Matcher;
+import org.codemucker.jmatch.Matcher;
 
 
 public class Criteria {
