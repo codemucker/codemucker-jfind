@@ -31,7 +31,7 @@ import org.codemucker.jmatch.Matcher;
 
 public class Criteria {
 	
-	private Roots.Builder rootsBuilder = Roots.builder();
+	private ClassRoots.Builder rootsBuilder = ClassRoots.builder();
 	
 	private final IncludeExcludeMatcherBuilder<RootResource> resources = IncludeExcludeMatcherBuilder.builder();
 	private final IncludeExcludeMatcherBuilder<Class<?>> classes = IncludeExcludeMatcherBuilder.builder();
@@ -70,7 +70,7 @@ public class Criteria {
 	}
 	
 	public Criteria setRoots(Iterable<Root> roots){
-		rootsBuilder = Roots.builder(roots);
+		rootsBuilder = ClassRoots.builder(roots);
 		return this;
 	}
 	

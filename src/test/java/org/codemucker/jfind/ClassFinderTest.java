@@ -57,11 +57,11 @@ public class ClassFinderTest {
 			.build();
 			
 		ClassFinder finderWithout = newFinderBuilder()
-				.setRoots(Roots.builder().build())
+				.setRoots(ClassRoots.builder().build())
 			.build();
 		
 		ClassFinder finderWith = newFinderBuilder()
-				.setRoots(Roots.builder()
+				.setRoots(ClassRoots.builder()
 					.setIncludeMainCompiledDir(true)
 					.setIncludeTestCompiledDir(true).build())
 			.build();
@@ -85,11 +85,11 @@ public class ClassFinderTest {
 	@Test
 	public void test_find_test_classes() {
 		ClassFinder finderNoTests = newFinderBuilder()
-			.setRoots(Roots.builder().setIncludeMainCompiledDir(true).build())
+			.setRoots(ClassRoots.builder().setIncludeMainCompiledDir(true).build())
 			.build();
 		
 		ClassFinder finderTests = newFinderBuilder()
-			.setRoots(Roots.builder()
+			.setRoots(ClassRoots.builder()
 				.setIncludeMainCompiledDir(true)
 				.setIncludeTestCompiledDir(true)
 				.build()
@@ -320,7 +320,7 @@ public class ClassFinderTest {
 	
 	private static Criteria newFinderBuilder(){
 		Criteria c = new Criteria()
-			.setRoots(Roots.builder()
+			.setRoots(ClassRoots.builder()
 				.setIncludeMainCompiledDir(true)
 				.setIncludeTestCompiledDir(true)
 				.build()

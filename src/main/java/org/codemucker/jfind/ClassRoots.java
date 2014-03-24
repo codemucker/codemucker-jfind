@@ -20,7 +20,7 @@ import org.codemucker.lang.IBuilder;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 
-public final class Roots  {
+public final class ClassRoots  {
 	
 	public static Builder builder(){
 		return new Builder();
