@@ -25,7 +25,7 @@ import org.codemucker.jfind.ClassFinder.FinderIgnoredCallback;
 import org.codemucker.jfind.ClassFinder.FinderMatchedCallback;
 import org.codemucker.jfind.matcher.AClass;
 import org.codemucker.jfind.matcher.IncludeExcludeMatcherBuilder;
-import org.codemucker.jfind.matcher.ResourceMatchers;
+import org.codemucker.jfind.matcher.AResource;
 import org.codemucker.jmatch.Matcher;
 
 
@@ -95,12 +95,12 @@ public class Criteria {
     }
 
 	public Criteria excludeFileName(String path) {
-		excludeResource(ResourceMatchers.withAntPath(path));
+		excludeResource(AResource.with().antPath(path));
 		return this;
 	}
 	
 	public Criteria excludeFileName(Pattern pattern) {
-		excludeResource(ResourceMatchers.withPath(pattern));
+		excludeResource(AResource.with().path(pattern));
 		return this;
 	}
 
@@ -110,12 +110,12 @@ public class Criteria {
 	}
 
 	public Criteria includeFileName(String pattern) {
-		includeResource(ResourceMatchers.withAntPath(pattern));
+		includeResource(AResource.with().antPath(pattern));
 		return this;
 	}
 
 	public Criteria includeFileName(Pattern pattern) {
-		includeResource(ResourceMatchers.withPath(pattern));
+		includeResource(AResource.with().path(pattern));
 		return this;
 	}
 	
@@ -125,12 +125,12 @@ public class Criteria {
 	}
 	
 	public Criteria assignableTo(Class<?>... superclass) {
-		includeClass(AClass.assignableTo(superclass));
+		includeClass(AClass.with().superclass(superclass));
 		return this;
 	}
 	
 	public <T extends Annotation> Criteria withAnnotation(Class<T>... annotations){
-		includeClass(AClass.withAnnotation(annotations));
+		includeClass(AClass.with().annotation(annotations));
 		return this;
 	}
 	
@@ -140,22 +140,22 @@ public class Criteria {
 	}
 	
 	public Criteria excludeEnum() {
-		excludeClassMatching(AClass.includeEnum());
+		excludeClassMatching(AClass.with().isEnum());
 		return this;
 	}
 
 	public Criteria excludeAnonymous() {
-		excludeClassMatching(AClass.includeAnonymous());
+		excludeClassMatching(AClass.with().isAnonymous());
 		return this;
 	}
 
 	public Criteria excludeInner() {
-		excludeClassMatching(AClass.includeInner());
+		excludeClassMatching(AClass.with().isInnerClass());
 		return this;
 	}
 
 	public Criteria excludeInterfaces() {
-		excludeClassMatching(AClass.includeInterfaces());
+		excludeClassMatching(AClass.with().isInterface());
 		return this;
 	}
 

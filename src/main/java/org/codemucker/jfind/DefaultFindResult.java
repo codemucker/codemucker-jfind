@@ -16,25 +16,25 @@ import org.codemucker.jmatch.Matcher;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 
-public class FindResultImpl<T> implements FindResult<T> {
+public class DefaultFindResult<T> implements FindResult<T> {
 
 	private final Iterable<T> source;
 	private Boolean empty;
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static final FindResultImpl EMPTY = new FindResultImpl(Collections.emptyList());
+	private static final DefaultFindResult EMPTY = new DefaultFindResult(Collections.emptyList());
 	
 	@SuppressWarnings("unchecked")
-	public static <T> FindResultImpl<T> emptyResults(){
+	public static <T> DefaultFindResult<T> emptyResults(){
 		return EMPTY;
 	}
 
-	public static <T> FindResultImpl<T> from(Iterable<T> source){
-		return new FindResultImpl<T>(source);
+	public static <T> DefaultFindResult<T> from(Iterable<T> source){
+		return new DefaultFindResult<T>(source);
 	}
 	
-	public static <T> FindResultImpl<T> from(Iterator<T> source){
-		return new FindResultImpl<T>(toIterable(source));
+	public static <T> DefaultFindResult<T> from(Iterator<T> source){
+		return new DefaultFindResult<T>(toIterable(source));
 	}
 	
 	private static <T> Iterable<T> toIterable(Iterator<T> iter){
@@ -50,7 +50,7 @@ public class FindResultImpl<T> implements FindResult<T> {
 	 * @param results can be null in which case it is treated as an empty list
 	 */
 	@SuppressWarnings("unchecked")
-    public FindResultImpl(Iterable<T> results) {
+    public DefaultFindResult(Iterable<T> results) {
 	    super();
 	    this.source = results==null?Collections.EMPTY_LIST:results;
     }

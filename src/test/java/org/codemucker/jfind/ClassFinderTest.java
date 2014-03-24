@@ -197,7 +197,7 @@ public class ClassFinderTest {
 	@Test
 	public void test_include_instance_of(){
 		ClassFinder finder = newFinderBuilder()
-			.includeClass(AClass.assignableTo(TstInterface1.class))
+			.includeClass(AClass.with().superclass(TstInterface1.class))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -212,8 +212,8 @@ public class ClassFinderTest {
 	@Test
 	public void test_multiple_implements(){
 		ClassFinder finder = newFinderBuilder()
-			.includeClass(AClass.assignableTo(TstInterface1.class))
-			.includeClass(AClass.assignableTo(TstInterface2.class))	
+			.includeClass(AClass.with().superclass(TstInterface1.class))
+			.includeClass(AClass.with().superclass(TstInterface2.class))	
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -231,8 +231,8 @@ public class ClassFinderTest {
 	public void test_class_must_match_multiple_matchers(){
 		ClassFinder finder = newFinderBuilder()
 			.includeClass(AClass.all(
-					AClass.assignableTo(TstInterface1.class),
-					AClass.assignableTo(TstInterface2.class)))	
+					AClass.with().superclass(TstInterface1.class),
+					AClass.with().superclass(TstInterface2.class)))	
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());

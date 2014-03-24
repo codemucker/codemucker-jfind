@@ -6,10 +6,11 @@ import org.codemucker.jmatch.AbstractNotNullMatcher;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
+import org.codemucker.jmatch.ObjectMatcher;
 
 import com.google.common.base.Objects;
 
-public class AClass {// extends Logical {
+public class AClass extends ObjectMatcher<Class<?>> {
 
 	public static final Matcher<Class<?>> MATCHER_ANONYMOUS = new AbstractNotNullMatcher<Class<?>>() {
 		@Override
@@ -39,6 +40,13 @@ public class AClass {// extends Logical {
 		}
 	};
 	
+	public static AClass with(){
+		return new AClass();
+	}
+	
+	private AClass() {
+	}
+
 	@SafeVarargs
     public static Matcher<Class<?>> any(final Matcher<Class<?>>... matchers) {
     	return Logical.any(matchers);
@@ -57,18 +65,18 @@ public class AClass {// extends Logical {
     	return Logical.none();
     }
 	
-    public static Matcher<Class<?>> withModifier(final int modifier){
-    	return new AbstractNotNullMatcher<Class<?>>(){
+    public AClass modifier(final int modifier){
+    	withMatcher(new AbstractNotNullMatcher<Class<?>>(){
 			@Override
             public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 	            return (found.getModifiers() & modifier) != 0;
             }
-    	};
+    	});
+    	return this;
     }
     
-    @SafeVarargs
-	public static Matcher<Class<?>> assignableTo(final Class<?>... superclass) {
-		return new AbstractNotNullMatcher<Class<?>>() {
+	public AClass superclass(final Class<?>... superclass) {
+		withMatcher(new AbstractNotNullMatcher<Class<?>>() {
 			@Override
 			public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 				for (Class<?> require : superclass) {
@@ -85,43 +93,53 @@ public class AClass {// extends Logical {
 					.add("superClassesMatching", superclass)
 					.toString();
 			}
-		};
+		});
+		return this;
 	}
 	
-	@SafeVarargs
-	public static Matcher<Class<?>> withAnnotation(Class<? extends Annotation>... annotations){
-		return new ContainsAnnotationsMatcher(annotations);
+	@SuppressWarnings("unchecked")
+	public AClass annotation(Class<? extends Annotation>... annotations){
+		withMatcher(new ContainsAnnotationsMatcher(annotations));
+		return this;
 	}
 	
-	public static Matcher<Class<?>> excludeEnum() {
-		return Logical.not(MATCHER_ENUM);
+	public AClass notEnum() {
+		withMatcher(Logical.not(MATCHER_ENUM));
+		return this;
 	}
 
-	public static Matcher<Class<?>> excludeAnonymous() {
-		return Logical.not(MATCHER_ANONYMOUS);
+	public AClass isNotAnonymous() {
+		withMatcher(Logical.not(MATCHER_ANONYMOUS));
+		return this;
 	}
 
-	public static Matcher<Class<?>> excludeInner() {
-		return Logical.not(MATCHER_INNER_CLASS);
+	public AClass isNotInner() {
+		withMatcher(Logical.not(MATCHER_INNER_CLASS));
+		return this;
 	}
 
-	public static Matcher<Class<?>> excludeInterfaces() {
-		return Logical.not(MATCHER_INTERFACE);
+	public AClass isNotInterface() {
+		withMatcher(Logical.not(MATCHER_INTERFACE));
+		return this;
 	}
 
-	public static Matcher<Class<?>> includeEnum() {
-		return MATCHER_ENUM;
+	public AClass isEnum() {
+		withMatcher(MATCHER_ENUM);
+		return this;
 	}
 
-	public static Matcher<Class<?>> includeAnonymous() {
-		return MATCHER_ANONYMOUS;
+	public AClass isAnonymous() {
+		withMatcher(MATCHER_ANONYMOUS);
+		return this;
 	}
 
-	public static Matcher<Class<?>> includeInner() {
-		return MATCHER_INNER_CLASS;
+	public AClass isInnerClass() {
+		withMatcher(MATCHER_INNER_CLASS);
+		return this;
 	}
 
-	public static Matcher<Class<?>> includeInterfaces() {
-		return MATCHER_INTERFACE;
+	public AClass isInterface() {
+		withMatcher(MATCHER_INTERFACE);
+		return this;
 	}
 }

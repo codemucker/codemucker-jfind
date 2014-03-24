@@ -9,10 +9,19 @@ import org.codemucker.jmatch.Description;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
+import org.codemucker.jmatch.PropertyMatcher;
 
 import com.google.common.base.Preconditions;
 
-public class ResourceMatchers { //extends Logical {
+public class AResource extends PropertyMatcher<RootResource> {
+	
+	public static AResource with(){
+		return new AResource();
+	}
+	
+	private AResource(){
+		super(RootResource.class);
+	}
 	
     public static Matcher<RootResource> any() {
     	return Logical.any();
@@ -22,48 +31,56 @@ public class ResourceMatchers { //extends Logical {
     	return Logical.none();
     }
     
-	public Matcher<RootResource> withPackage(String packageName) {
+	public AResource pkg(String packageName) {
 		String regExp = "/" + packageName.replace('.', '/') + "/.*";
-		return withPath(Pattern.compile(regExp));
+		path(Pattern.compile(regExp));
+		return this;
 	}
 
-	public static Matcher<RootResource> withExtension(String extension) {
-		return withAntPath("*." + extension);
+	public AResource extension(String extension) {
+		antPath("*." + extension);
+		return this;
 	}
 
-	public static Matcher<RootResource> withName(Class<?> classToMatch) {
+	public AResource name(Class<?> classToMatch) {
 		String path = '/' + classToMatch.getSimpleName() + "\\.java";
 		Package pkg = classToMatch.getPackage();
 		if (pkg != null) {
 			path = '/' + pkg.getName().replace('.', '/') + path;
 		}
-		return withPath(Pattern.compile(path));
+		path(Pattern.compile(path));
+		return this;
 	}
 	
-	public static Matcher<RootResource> withName(String antPattern) {
-		return withAntPath("*/" + antPattern);
+	public AResource name(String antPattern) {
+		antPath("*/" + antPattern);
+		return this;
 	}
 
-	public static Matcher<RootResource> inPackag(Class<?> classWithPkg) {
-		return inPackage(classWithPkg.getPackage());
+	public AResource pkg(Class<?> classWithPkg) {
+		pkg(classWithPkg.getPackage());
+		return this;
 	}
 
-	public static Matcher<RootResource> inPackage(Package pkg) {
-		return withAntPath(pkg.toString().replace('.', '/'));
+	public AResource pkg(Package pkg) {
+		antPath(pkg.toString().replace('.', '/'));
+		return this;
 	}
 
-	public static Matcher<RootResource> withAntPath(String antPattern) {
-		return withPath(AString.withAntPattern(antPattern));
+	public AResource antPath(String antPattern) {
+		path(AString.withAntPattern(antPattern));
+		return this;
 	}
 
-	public static Matcher<RootResource> withPath(Pattern pattern) {
-		return withPath(AString.withPattern(pattern));
+	public AResource path(Pattern pattern) {
+		path(AString.withPattern(pattern));
+		return this;
 	}
 	
-	public static Matcher<RootResource> withPath(Matcher<String> pathMatcher) {
-		return new ResourcePathMatcher(pathMatcher);
+	public AResource path(Matcher<String> pathMatcher) {
+		withMatcher(new ResourcePathMatcher(pathMatcher));
+		return this;
 	}
-	
 	
 	private static class ResourcePathMatcher extends AbstractMatcher<RootResource>{
 		private final Matcher<String> pathMatcher;
