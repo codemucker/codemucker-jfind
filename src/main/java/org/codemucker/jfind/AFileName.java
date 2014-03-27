@@ -1,4 +1,4 @@
-package org.codemucker.jfind.matcher;
+package org.codemucker.jfind;
 
 import java.util.regex.Pattern;
 
@@ -20,14 +20,14 @@ public class AFileName extends ObjectMatcher<String> {
     	return Logical.any();
     }
     
-	public AFileName pkg(String packageName) {
+	public AFileName packageName(String packageName) {
 		String regExp = "/" + packageName.replace('.', '/') + "/.*";
-		path(Pattern.compile(regExp));
+		pathRegexMatch(Pattern.compile(regExp));
 		return this;
 	}
 
 	public AFileName extension(String extension) {
-		antPath("*." + extension);
+		pathAntPatternMatch("*." + extension);
 		return this;
 	}
 
@@ -37,32 +37,32 @@ public class AFileName extends ObjectMatcher<String> {
 		if (pkg != null) {
 			path = '/' + pkg.getName().replace('.', '/') + path;
 		}
-		path(Pattern.compile(path));
+		pathRegexMatch(Pattern.compile(path));
 		return this;
 	}
 	
-	public AFileName antName(String antPattern) {
-		antPath("*/" + antPattern);
+	public AFileName nameAntPatternMatch(String antPattern) {
+		pathAntPatternMatch("*/" + antPattern);
 		return this;
 	}
 
-	public AFileName pkg(Class<?> classWithPkg) {
-		pkg(classWithPkg.getPackage());
+	public AFileName packageName(Class<?> classWithPkg) {
+		packageName(classWithPkg.getPackage());
 		return this;
 	}
 
-	public AFileName pkg(Package pkg) {
-		antPath(pkg.toString().replace('.', '/'));
+	public AFileName packageName(Package pkg) {
+		pathAntPatternMatch(pkg.toString().replace('.', '/'));
 		return this;
 	}
 	
-	public AFileName antPath(String antPattern) {
-		withMatcher(AString.withAntPattern(antPattern));
+	public AFileName pathAntPatternMatch(String antPattern) {
+		addMatcher(AString.withAntPattern(antPattern));
 		return this;
 	}
 
-	public AFileName path(Pattern pattern) {
-		withMatcher(AString.withPattern(pattern));
+	public AFileName pathRegexMatch(Pattern pattern) {
+		addMatcher(AString.withPattern(pattern));
 		return this;
 	}
 }

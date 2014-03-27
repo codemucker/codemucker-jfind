@@ -29,7 +29,6 @@ import org.codemucker.jfind.c.TstAnonymous;
 import org.codemucker.jfind.d.TstInner;
 import org.codemucker.jfind.e.TstAnnotation;
 import org.codemucker.jfind.e.TstAnnotationBean;
-import org.codemucker.jfind.matcher.AClass;
 import org.codemucker.jmatch.AString;
 import org.junit.Test;
 
@@ -57,11 +56,11 @@ public class ClassFinderTest {
 			.build();
 			
 		ClassFinder finderWithout = newFinderBuilder()
-				.setRoots(ClassRoots.builder().build())
+				.setRoots(Roots.builder().build())
 			.build();
 		
 		ClassFinder finderWith = newFinderBuilder()
-				.setRoots(ClassRoots.builder()
+				.setRoots(Roots.builder()
 					.setIncludeMainCompiledDir(true)
 					.setIncludeTestCompiledDir(true).build())
 			.build();
@@ -85,11 +84,11 @@ public class ClassFinderTest {
 	@Test
 	public void test_find_test_classes() {
 		ClassFinder finderNoTests = newFinderBuilder()
-			.setRoots(ClassRoots.builder().setIncludeMainCompiledDir(true).build())
+			.setRoots(Roots.builder().setIncludeMainCompiledDir(true).build())
 			.build();
 		
 		ClassFinder finderTests = newFinderBuilder()
-			.setRoots(ClassRoots.builder()
+			.setRoots(Roots.builder()
 				.setIncludeMainCompiledDir(true)
 				.setIncludeTestCompiledDir(true)
 				.build()
@@ -197,7 +196,7 @@ public class ClassFinderTest {
 	@Test
 	public void test_include_instance_of(){
 		ClassFinder finder = newFinderBuilder()
-			.includeClass(AClass.with().superclass(TstInterface1.class))
+			.includeClass(AClass.with().subclassOf(TstInterface1.class))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -212,8 +211,8 @@ public class ClassFinderTest {
 	@Test
 	public void test_multiple_implements(){
 		ClassFinder finder = newFinderBuilder()
-			.includeClass(AClass.with().superclass(TstInterface1.class))
-			.includeClass(AClass.with().superclass(TstInterface2.class))	
+			.includeClass(AClass.with().subclassOf(TstInterface1.class))
+			.includeClass(AClass.with().subclassOf(TstInterface2.class))	
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -231,8 +230,8 @@ public class ClassFinderTest {
 	public void test_class_must_match_multiple_matchers(){
 		ClassFinder finder = newFinderBuilder()
 			.includeClass(AClass.all(
-					AClass.with().superclass(TstInterface1.class),
-					AClass.with().superclass(TstInterface2.class)))	
+					AClass.with().subclassOf(TstInterface1.class),
+					AClass.with().subclassOf(TstInterface2.class)))	
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -320,7 +319,7 @@ public class ClassFinderTest {
 	
 	private static Criteria newFinderBuilder(){
 		Criteria c = new Criteria()
-			.setRoots(ClassRoots.builder()
+			.setRoots(Roots.builder()
 				.setIncludeMainCompiledDir(true)
 				.setIncludeTestCompiledDir(true)
 				.build()

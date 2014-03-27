@@ -1,7 +1,6 @@
 package org.codemucker.jfind;
 
 import org.codemucker.jfind.ClassFinder.FinderFilter;
-import org.codemucker.jfind.matcher.AClass;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.Matcher;
 

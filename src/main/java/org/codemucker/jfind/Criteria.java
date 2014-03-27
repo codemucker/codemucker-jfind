@@ -23,15 +23,12 @@ import org.codemucker.jfind.ClassFinder.FinderErrorCallback;
 import org.codemucker.jfind.ClassFinder.FinderFilter;
 import org.codemucker.jfind.ClassFinder.FinderIgnoredCallback;
 import org.codemucker.jfind.ClassFinder.FinderMatchedCallback;
-import org.codemucker.jfind.matcher.AClass;
-import org.codemucker.jfind.matcher.IncludeExcludeMatcherBuilder;
-import org.codemucker.jfind.matcher.AResource;
 import org.codemucker.jmatch.Matcher;
 
 
 public class Criteria {
 	
-	private ClassRoots.Builder rootsBuilder = ClassRoots.builder();
+	private Roots.Builder rootsBuilder = Roots.builder();
 	
 	private final IncludeExcludeMatcherBuilder<RootResource> resources = IncludeExcludeMatcherBuilder.builder();
 	private final IncludeExcludeMatcherBuilder<Class<?>> classes = IncludeExcludeMatcherBuilder.builder();
@@ -70,7 +67,7 @@ public class Criteria {
 	}
 	
 	public Criteria setRoots(Iterable<Root> roots){
-		rootsBuilder = ClassRoots.builder(roots);
+		rootsBuilder = Roots.builder(roots);
 		return this;
 	}
 	
@@ -95,12 +92,12 @@ public class Criteria {
     }
 
 	public Criteria excludeFileName(String path) {
-		excludeResource(AResource.with().antPath(path));
+		excludeResource(AResource.with().pathAntPatternMatch(path));
 		return this;
 	}
 	
 	public Criteria excludeFileName(Pattern pattern) {
-		excludeResource(AResource.with().path(pattern));
+		excludeResource(AResource.with().pathRegexMatch(pattern));
 		return this;
 	}
 
@@ -110,12 +107,12 @@ public class Criteria {
 	}
 
 	public Criteria includeFileName(String pattern) {
-		includeResource(AResource.with().antPath(pattern));
+		includeResource(AResource.with().pathAntPatternMatch(pattern));
 		return this;
 	}
 
 	public Criteria includeFileName(Pattern pattern) {
-		includeResource(AResource.with().path(pattern));
+		includeResource(AResource.with().pathRegexMatch(pattern));
 		return this;
 	}
 	
@@ -125,7 +122,7 @@ public class Criteria {
 	}
 	
 	public Criteria assignableTo(Class<?>... superclass) {
-		includeClass(AClass.with().superclass(superclass));
+		includeClass(AClass.with().subclassOf(superclass));
 		return this;
 	}
 	

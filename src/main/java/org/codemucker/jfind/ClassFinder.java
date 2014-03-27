@@ -92,11 +92,11 @@ public class ClassFinder {
 		//checkState(map.size()>0,"need some class path roots to search");
 		return newArrayList(map.values());
 	}
-	public Collection<Class<?>> findClasses() {
-		return findClasses(findClassNames());
+	public FindResult<Class<?>> findClasses() {
+		return DefaultFindResult.from(findClasses(findClassNames()));
 	}
 	
-	private Collection<Class<?>> findClasses(Collection<String> classNames){
+	private Collection<Class<?>> findClasses(Iterable<String> classNames){
 		Collection<Class<?>> classes = newArrayList();
 		for(String className:classNames){
 			loadClass(classes,className);
@@ -134,11 +134,11 @@ public class ClassFinder {
 		}
 	}
 
-	public Collection<String> findClassNames(){
-		return findClassNames(findResources());
+	public FindResult<String> findClassNames(){
+		return DefaultFindResult.from(findClassNames(findResources()));
 	}
 	
-	private Collection<String> findClassNames(Collection<RootResource> resources){
+	private Collection<String> findClassNames(Iterable<RootResource> resources){
 		Collection<String> foundClassNames = newArrayList();
 		for(RootResource resource:resources){
 			walkClassNames(foundClassNames, resource);
@@ -160,8 +160,8 @@ public class ClassFinder {
 		}
 	}
 	
-	public Collection<RootResource> findResources(){
-		return findResources(classPathRoots);
+	public FindResult<RootResource> findResources(){
+		return DefaultFindResult.from(findResources(classPathRoots));
 	}
 	
 	private Collection<RootResource> findResources(Iterable<Root> roots){

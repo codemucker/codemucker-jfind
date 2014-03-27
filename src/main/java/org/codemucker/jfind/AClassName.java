@@ -1,4 +1,4 @@
-package org.codemucker.jfind.matcher;
+package org.codemucker.jfind;
 
 import java.util.regex.Pattern;
 
@@ -24,35 +24,35 @@ public class AClassName extends ObjectMatcher<String> {
     	return Logical.none();
     }
 
-    public AClassName withExactPackage(String packageName) {
+    public AClassName packageName(String packageName) {
 		String regExp = packageName.replaceAll("\\.", "\\.") + "\\.[^.]*";
-		withNamePattern(regExp);
+		nameRegexMatch(regExp);
 		return this;
     }
     
-    public AClassName withPackageStartingWith(String packageName) {
+    public AClassName packageStartingWith(String packageName) {
 		String regExp = packageName.replaceAll("\\.", "\\.") + "\\..*";
-		withNamePattern(regExp);
+		nameRegexMatch(regExp);
 		return this;
 	}
     
-    public AClassName withNameAntPattern(final String nameAntPattern){
-    	withMatcher(AString.withAntPattern(nameAntPattern));
+    public AClassName nameAntPatternMatch(final String nameAntPattern){
+    	addMatcher(AString.withAntPattern(nameAntPattern));
     	return this;
     }
 
-    public AClassName withNamePattern(final String namePattern){
-    	withMatcher(AString.withPattern(namePattern));
+    public AClassName nameRegexMatch(final String namePattern){
+    	addMatcher(AString.withPattern(namePattern));
     	return this;
     }
 
-    public AClassName withNamePattern(Pattern pattern){
-    	withMatcher(AString.withPattern(pattern));
+    public AClassName nameRegexMatch(Pattern pattern){
+    	addMatcher(AString.withPattern(pattern));
     	return this;
     }
     
-    public AClassName withName(final String name){
-    	withMatcher(AString.equalTo(name));
+    public AClassName name(final String name){
+    	addMatcher(AString.equalTo(name));
     	return this;
     }
 }

@@ -1,4 +1,4 @@
-package org.codemucker.jfind.matcher;
+package org.codemucker.jfind;
 
 import java.lang.annotation.Annotation;
 
@@ -40,6 +40,14 @@ public class AClass extends ObjectMatcher<Class<?>> {
 		}
 	};
 	
+	/**
+	 * synonym for with()
+	 * @return
+	 */
+	public static AClass that(){
+		return with();
+	}
+	
 	public static AClass with(){
 		return new AClass();
 	}
@@ -66,7 +74,7 @@ public class AClass extends ObjectMatcher<Class<?>> {
     }
 	
     public AClass modifier(final int modifier){
-    	withMatcher(new AbstractNotNullMatcher<Class<?>>(){
+    	addMatcher(new AbstractNotNullMatcher<Class<?>>(){
 			@Override
             public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 	            return (found.getModifiers() & modifier) != 0;
@@ -75,8 +83,13 @@ public class AClass extends ObjectMatcher<Class<?>> {
     	return this;
     }
     
-	public AClass superclass(final Class<?>... superclass) {
-		withMatcher(new AbstractNotNullMatcher<Class<?>>() {
+    /**
+     * Expect a class to be a sub class, implementation of, or equal to the given superclass
+     * @param superclass
+     * @return
+     */
+	public AClass isASubclassOf(final Class<?>... superclass) {
+		addMatcher(new AbstractNotNullMatcher<Class<?>>() {
 			@Override
 			public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 				for (Class<?> require : superclass) {
@@ -90,56 +103,80 @@ public class AClass extends ObjectMatcher<Class<?>> {
 			@Override
 			public String toString(){
 				return Objects.toStringHelper(this)
-					.add("superClassesMatching", superclass)
+					.add("subclass of", superclass)
 					.toString();
 			}
 		});
 		return this;
 	}
-	
+	/**
+	 * Class must be marked with the given annotation
+	 * @param annotations
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public AClass annotation(Class<? extends Annotation>... annotations){
-		withMatcher(new ContainsAnnotationsMatcher(annotations));
+		addMatcher(new ContainsAnnotationsMatcher(annotations));
 		return this;
 	}
 	
 	public AClass notEnum() {
-		withMatcher(Logical.not(MATCHER_ENUM));
+		addMatcher(Logical.not(MATCHER_ENUM));
 		return this;
 	}
 
 	public AClass isNotAnonymous() {
-		withMatcher(Logical.not(MATCHER_ANONYMOUS));
+		addMatcher(Logical.not(MATCHER_ANONYMOUS));
 		return this;
 	}
 
 	public AClass isNotInner() {
-		withMatcher(Logical.not(MATCHER_INNER_CLASS));
+		addMatcher(Logical.not(MATCHER_INNER_CLASS));
 		return this;
 	}
 
 	public AClass isNotInterface() {
-		withMatcher(Logical.not(MATCHER_INTERFACE));
+		addMatcher(Logical.not(MATCHER_INTERFACE));
 		return this;
 	}
 
 	public AClass isEnum() {
-		withMatcher(MATCHER_ENUM);
+		addMatcher(MATCHER_ENUM);
 		return this;
 	}
 
 	public AClass isAnonymous() {
-		withMatcher(MATCHER_ANONYMOUS);
+		addMatcher(MATCHER_ANONYMOUS);
 		return this;
 	}
 
 	public AClass isInnerClass() {
-		withMatcher(MATCHER_INNER_CLASS);
+		addMatcher(MATCHER_INNER_CLASS);
 		return this;
 	}
 
 	public AClass isInterface() {
-		withMatcher(MATCHER_INTERFACE);
+		addMatcher(MATCHER_INTERFACE);
 		return this;
+	}
+	
+	private static class ContainsAnnotationsMatcher extends AbstractNotNullMatcher<Class<?>> {
+		private final Class<? extends Annotation>[] annotations;
+
+		@SafeVarargs
+		public ContainsAnnotationsMatcher(Class<? extends Annotation>... annotations) {
+	        this.annotations = annotations;
+	    }
+
+		@Override
+		@SuppressWarnings("rawtypes")
+		public boolean matchesSafely(Class found,MatchDiagnostics diag) {
+			for (Class<?> anon : annotations) {
+				if (found.getAnnotation(anon) == null) {
+					return false;
+				}
+			}
+			return true;
+		}
 	}
 }

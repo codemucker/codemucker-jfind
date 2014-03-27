@@ -1,4 +1,4 @@
-package org.codemucker.jfind.matcher;
+package org.codemucker.jfind;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.codemucker.jmatch.Logical.all;
