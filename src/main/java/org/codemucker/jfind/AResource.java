@@ -32,12 +32,12 @@ public class AResource extends PropertyMatcher<RootResource> {
     
 	public AResource packageName(String packageName) {
 		String regExp = "/" + packageName.replace('.', '/') + "/.*";
-		pathRegexMatch(Pattern.compile(regExp));
+		pathMatchingRegex(Pattern.compile(regExp));
 		return this;
 	}
 
 	public AResource extension(String extension) {
-		pathAntPatternMatch("*." + extension);
+		pathMatchingAntPattern("*." + extension);
 		return this;
 	}
 
@@ -47,12 +47,12 @@ public class AResource extends PropertyMatcher<RootResource> {
 		if (pkg != null) {
 			path = '/' + pkg.getName().replace('.', '/') + path;
 		}
-		pathRegexMatch(Pattern.compile(path));
+		pathMatchingRegex(Pattern.compile(path));
 		return this;
 	}
 	
 	public AResource nameAntPatternMatch(String antPattern) {
-		pathAntPatternMatch("*/" + antPattern);
+		pathMatchingAntPattern("*/" + antPattern);
 		return this;
 	}
 
@@ -62,17 +62,22 @@ public class AResource extends PropertyMatcher<RootResource> {
 	}
 
 	public AResource packageName(Package pkg) {
-		pathAntPatternMatch(pkg.toString().replace('.', '/'));
+		pathMatchingAntPattern(pkg.toString().replace('.', '/'));
 		return this;
 	}
 
-	public AResource pathAntPatternMatch(String antPattern) {
+	public AResource pathMatchingAntPattern(String antPattern) {
 		path(AString.withAntPattern(antPattern));
 		return this;
 	}
 
-	public AResource pathRegexMatch(Pattern pattern) {
+	public AResource pathMatchingRegex(Pattern pattern) {
 		path(AString.withPattern(pattern));
+		return this;
+	}
+	
+	public AResource path(String path) {
+		path(AString.equalTo(path));
 		return this;
 	}
 	

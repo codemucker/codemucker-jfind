@@ -22,11 +22,11 @@ import com.google.common.io.Files;
 
 public final class Roots  {
 	
-	public static Builder builder(){
+	public static Builder with(){
 		return new Builder();
 	}
 	
-	public static Builder builder(Iterable<Root> roots){
+	public static Builder with(Iterable<Root> roots){
 		return new Builder(roots);
 	}
 	
@@ -55,7 +55,7 @@ public final class Roots  {
 		
 		private Builder(Iterable<Root> roots){
 			//prevent instantiation outside of builder method
-			addRoots(roots);
+			roots(roots);
 		}
 		/**
 		 * Return a mutable list of class path roots. CHanges in the builder are not reflected in the returned
@@ -67,23 +67,23 @@ public final class Roots  {
 			Builder copy = new Builder();
 			copy.roots.putAll(roots);
 			if (includeMainSrcDir) {
-				copy.addRoot(resolver.getMainSrcDirs(),RootType.MAIN, RootContentType.SRC);
+				copy.roots(resolver.getMainSrcDirs(),RootType.MAIN, RootContentType.SRC);
 			}
 			if (includeTestSrcDir) {
-				copy.addRoot(resolver.getTestSrcDirs(),RootType.MAIN, RootContentType.SRC);
+				copy.roots(resolver.getTestSrcDirs(),RootType.MAIN, RootContentType.SRC);
 			}
 			if (includeGeneratedSrcDir) {
-				copy.addRoot(resolver.getGeneratedSrcDirs(),RootType.MAIN, RootContentType.SRC);
+				copy.roots(resolver.getGeneratedSrcDirs(),RootType.MAIN, RootContentType.SRC);
 			}
 			if (includeMainCompiledDir) {
-				copy.addRoot(resolver.getMainCompileTargetDirs(),RootType.MAIN, RootContentType.BINARY);
+				copy.roots(resolver.getMainCompileTargetDirs(),RootType.MAIN, RootContentType.BINARY);
 			}
 			if (includeTestCompiledDir) {
-				copy.addRoot(resolver.getTestCompileTargetDirs(),RootType.TEST, RootContentType.BINARY);
+				copy.roots(resolver.getTestCompileTargetDirs(),RootType.TEST, RootContentType.BINARY);
 			}
 			
 			if (includeClasspath) {
-				copy.addRoots(findClassPathDirs());
+				copy.roots(findClassPathDirs());
 			}
 			return newArrayList(copy.roots.values());
 		}
@@ -132,11 +132,17 @@ public final class Roots  {
 			return files;
 		}	
 		
-		public Builder setProjectResolver(ProjectResolver resolver){
+		public Builder projectResolver(ProjectResolver resolver){
 			this.projectResolver = resolver;
 			return this;
 		}
 		
+		public Builder archiveFileExtensions(String... extensions) {
+			for(String ext:extensions){
+				archiveFileExtension(ext);
+			}
+	    	return this;
+	    }
 		/**
 		 * Add additional file extension types to denote an archive resources (like a jar). E.g. 'jar'
 		 * 
@@ -145,52 +151,52 @@ public final class Roots  {
 		 * @param extension
 		 * @return
 		 */
-		public Builder addArchiveFileExtension(String extension) {
+		public Builder archiveFileExtension(String extension) {
 			this.archiveTypes.add(extension);
 	    	return this;
 	    }
 		
-		public Builder addRoot(String path) {
-	    	addRootDir(new File(path));
+		public Builder root(String path) {
+	    	root(new File(path));
 	    	return this;
 	    }
 	
-		public Builder addRoots(Collection<File> paths) {
+		public Builder roots(Collection<File> paths) {
 			for( File path:paths){
-				addRootDir(path);
+				root(path);
 			}
 	    	return this;
 	    }
 		
-		public Builder addRoot(Collection<File> paths, RootType relation, RootContentType contentType) {
+		public Builder roots(Collection<File> paths, RootType relation, RootContentType contentType) {
 			for(File path:paths){
-				addRoot(new DirectoryRoot(path,relation, contentType));
+				root(new DirectoryRoot(path,relation, contentType));
 			}
 	    	return this;
 	    }
 		
-		public Builder addRootDir(File path) {
+		public Builder root(File path) {
 			if( path.isFile()){
 				String extension = Files.getFileExtension(path.getName()).toLowerCase();
 				if(archiveTypes.contains(extension)){
-					addRoot(new ArchiveRoot(path,RootType.DEPENDENCY, RootContentType.BINARY));	
+					root(new ArchiveRoot(path,RootType.DEPENDENCY, RootContentType.BINARY));	
 				} else {
 					throw new IllegalArgumentException("Don't currently know how to handle roots with file extension ." + extension); 
 				}
 			} else {
-				addRoot(new DirectoryRoot(path,RootType.DEPENDENCY,RootContentType.BINARY));
+				root(new DirectoryRoot(path,RootType.DEPENDENCY,RootContentType.BINARY));
 			}
 			return this;
 	    }
 	
-		public Builder addRoots(Iterable<Root> roots) {
+		public Builder roots(Iterable<Root> roots) {
 			for(Root root:roots){
-				addRoot(root);
+				root(root);
 			}
 			return this;
 		}
 		
-		public Builder addRoot(Root root) {
+		public Builder root(Root root) {
 			String key = root.getPathName();
 			if ((RootType.UNKNOWN != root.getType()) || !roots.containsKey(key)) {
 				roots.put(key, root);
@@ -198,49 +204,49 @@ public final class Roots  {
 			return this;
 		}
 		
-		public Builder setIncludeAll() {
-			setIncludeMainSrcDir(true);
-			setIncludeTestSrcDir(true);
-			setIncludeGeneratedSrcDir(true);
-			setIncludeClasspath(true);
-			setIncludeMainCompiledDir(true);
-			setIncludeTestCompiledDir(true);
+		public Builder allDirs() {
+			mainSrcDir(true);
+			testSrcDir(true);
+			generatedSrcDir(true);
+			classpath(true);
+			mainCompiledDir(true);
+			testCompiledDir(true);
 			return this;
 		}
 
-		public Builder setIncludeAllSrcs() {
-			setIncludeMainSrcDir(true);
-			setIncludeGeneratedSrcDir(true);
-			setIncludeTestSrcDir(true);
-			setIncludeClasspath(false);
+		public Builder allSrcDirs() {
+			mainSrcDir(true);
+			generatedSrcDir(true);
+			testSrcDir(true);
+			classpath(false);
 			return this;
 		}
 		
-		public Builder setIncludeMainSrcDir(boolean b) {
+		public Builder mainSrcDir(boolean b) {
 			this.includeMainSrcDir = b;
 			return this;
 		}
 	
-		public Builder setIncludeTestSrcDir(boolean b) {
+		public Builder testSrcDir(boolean b) {
 			this.includeTestSrcDir = b;
 			return this;
 		}
 	
-		public Builder setIncludeGeneratedSrcDir(boolean b) {
+		public Builder generatedSrcDir(boolean b) {
 			this.includeGeneratedSrcDir = b;
 			return this;
 		}
 	
-		public Builder setIncludeMainCompiledDir(boolean b) {
+		public Builder mainCompiledDir(boolean b) {
 			this.includeMainCompiledDir = b;
 			return this;
 		}
 		
-		public Builder setIncludeTestCompiledDir(boolean b) {
+		public Builder testCompiledDir(boolean b) {
 			this.includeTestCompiledDir = b;
 			return this;
 		}
-		public Builder setIncludeClasspath(boolean b) {
+		public Builder classpath(boolean b) {
 	    	this.includeClasspath = b;
 	    	return this;
 	    }

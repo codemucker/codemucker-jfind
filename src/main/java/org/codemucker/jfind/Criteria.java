@@ -28,7 +28,7 @@ import org.codemucker.jmatch.Matcher;
 
 public class Criteria {
 	
-	private Roots.Builder rootsBuilder = Roots.builder();
+	private Roots.Builder rootsBuilder = Roots.with();
 	
 	private final IncludeExcludeMatcherBuilder<RootResource> resources = IncludeExcludeMatcherBuilder.builder();
 	private final IncludeExcludeMatcherBuilder<Class<?>> classes = IncludeExcludeMatcherBuilder.builder();
@@ -62,12 +62,12 @@ public class Criteria {
 	}
 
 	public Criteria addRoots(Root root){
-		rootsBuilder.addRoot(root);
+		rootsBuilder.root(root);
 		return this;
 	}
 	
 	public Criteria setRoots(Iterable<Root> roots){
-		rootsBuilder = Roots.builder(roots);
+		rootsBuilder = Roots.with(roots);
 		return this;
 	}
 	
@@ -92,12 +92,12 @@ public class Criteria {
     }
 
 	public Criteria excludeFileName(String path) {
-		excludeResource(AResource.with().pathAntPatternMatch(path));
+		excludeResource(AResource.with().pathMatchingAntPattern(path));
 		return this;
 	}
 	
 	public Criteria excludeFileName(Pattern pattern) {
-		excludeResource(AResource.with().pathRegexMatch(pattern));
+		excludeResource(AResource.with().pathMatchingRegex(pattern));
 		return this;
 	}
 
@@ -107,12 +107,12 @@ public class Criteria {
 	}
 
 	public Criteria includeFileName(String pattern) {
-		includeResource(AResource.with().pathAntPatternMatch(pattern));
+		includeResource(AResource.with().pathMatchingAntPattern(pattern));
 		return this;
 	}
 
 	public Criteria includeFileName(Pattern pattern) {
-		includeResource(AResource.with().pathRegexMatch(pattern));
+		includeResource(AResource.with().pathMatchingRegex(pattern));
 		return this;
 	}
 	
@@ -122,7 +122,7 @@ public class Criteria {
 	}
 	
 	public Criteria assignableTo(Class<?>... superclass) {
-		includeClass(AClass.with().subclassOf(superclass));
+		includeClass(AClass.with().isASubclassOf(superclass));
 		return this;
 	}
 	

@@ -56,13 +56,13 @@ public class ClassFinderTest {
 			.build();
 			
 		ClassFinder finderWithout = newFinderBuilder()
-				.setRoots(Roots.builder().build())
+				.setRoots(Roots.with().build())
 			.build();
 		
 		ClassFinder finderWith = newFinderBuilder()
-				.setRoots(Roots.builder()
-					.setIncludeMainCompiledDir(true)
-					.setIncludeTestCompiledDir(true).build())
+				.setRoots(Roots.with()
+					.mainCompiledDir(true)
+					.testCompiledDir(true).build())
 			.build();
 
 		Collection<Class<?>> foundDefault = list(finderDefault.findClasses());
@@ -84,13 +84,13 @@ public class ClassFinderTest {
 	@Test
 	public void test_find_test_classes() {
 		ClassFinder finderNoTests = newFinderBuilder()
-			.setRoots(Roots.builder().setIncludeMainCompiledDir(true).build())
+			.setRoots(Roots.with().mainCompiledDir(true).build())
 			.build();
 		
 		ClassFinder finderTests = newFinderBuilder()
-			.setRoots(Roots.builder()
-				.setIncludeMainCompiledDir(true)
-				.setIncludeTestCompiledDir(true)
+			.setRoots(Roots.with()
+				.mainCompiledDir(true)
+				.testCompiledDir(true)
 				.build()
 			)
 			.build();
@@ -196,7 +196,7 @@ public class ClassFinderTest {
 	@Test
 	public void test_include_instance_of(){
 		ClassFinder finder = newFinderBuilder()
-			.includeClass(AClass.with().subclassOf(TstInterface1.class))
+			.includeClass(AClass.that().isASubclassOf(TstInterface1.class))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -211,8 +211,8 @@ public class ClassFinderTest {
 	@Test
 	public void test_multiple_implements(){
 		ClassFinder finder = newFinderBuilder()
-			.includeClass(AClass.with().subclassOf(TstInterface1.class))
-			.includeClass(AClass.with().subclassOf(TstInterface2.class))	
+			.includeClass(AClass.that().isASubclassOf(TstInterface1.class))
+			.includeClass(AClass.that().isASubclassOf(TstInterface2.class))	
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -230,8 +230,8 @@ public class ClassFinderTest {
 	public void test_class_must_match_multiple_matchers(){
 		ClassFinder finder = newFinderBuilder()
 			.includeClass(AClass.all(
-					AClass.with().subclassOf(TstInterface1.class),
-					AClass.with().subclassOf(TstInterface2.class)))	
+					AClass.that().isASubclassOf(TstInterface1.class),
+					AClass.that().isASubclassOf(TstInterface2.class)))	
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -319,9 +319,9 @@ public class ClassFinderTest {
 	
 	private static Criteria newFinderBuilder(){
 		Criteria c = new Criteria()
-			.setRoots(Roots.builder()
-				.setIncludeMainCompiledDir(true)
-				.setIncludeTestCompiledDir(true)
+			.setRoots(Roots.with()
+				.mainCompiledDir(true)
+				.testCompiledDir(true)
 				.build()
 			)
 			.setConsoleLoggingCallback();
