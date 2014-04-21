@@ -57,12 +57,12 @@ public class AFileName extends ObjectMatcher<String> {
 	}
 	
 	public AFileName pathAntPatternMatch(String antPattern) {
-		addMatcher(AString.withAntPattern(antPattern));
+		addMatcher(AString.matchingAntPattern(antPattern));
 		return this;
 	}
 
 	public AFileName pathRegexMatch(Pattern pattern) {
-		addMatcher(AString.withPattern(pattern));
+		addMatcher(AString.matchingRegex(pattern));
 		return this;
 	}
 }

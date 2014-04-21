@@ -20,7 +20,7 @@ public final class IncludeExcludeMatcherBuilder<T> {
 
     public Matcher<T> build(){
 		if (includes.size() > 0 && excludes.size() > 0) {
-			return all(not(all(excludes)), any(includes));
+			return all(not(any(excludes)), any(includes));
 		} else if (excludes.size() > 0) {
 			return not(any(excludes));
 		} else if (includes.size() > 0) {

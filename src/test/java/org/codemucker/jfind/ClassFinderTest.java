@@ -128,7 +128,7 @@ public class ClassFinderTest {
 			.build();
 			
 		ClassFinder finderWithout = newFinderBuilder()
-			.excludeResource(ARootResource.with().path(AString.withAntPattern("*/b/*")))
+			.excludeResource(ARootResource.with().path(AString.matchingAntPattern("*/b/*")))
 			.build();
 
 		Collection<Class<?>> foundWith = list(finderWith.findClasses());
@@ -145,7 +145,7 @@ public class ClassFinderTest {
 	@Test
 	public void test_filename_exclude_target_has_no_effect(){
 		ClassFinder finder = newFinderBuilder()
-			.excludeResource(ARootResource.with().path(AString.withAntPattern("*/target/*")))
+			.excludeResource(ARootResource.with().path(AString.matchingAntPattern("*/target/*")))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -172,8 +172,8 @@ public class ClassFinderTest {
 	@Test
 	public void test_filename_include_multiple_packages(){
 		ClassFinder finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.withAntPattern("*/a/*")))
-			.includeResource(ARootResource.with().path(AString.withAntPattern("*/b/*")))
+			.includeResource(ARootResource.with().path(AString.matchingAntPattern("*/a/*")))
+			.includeResource(ARootResource.with().path(AString.matchingAntPattern("*/b/*")))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -184,8 +184,8 @@ public class ClassFinderTest {
 	@Test
 	public void test_filename_exclude_trumps_include(){
 		ClassFinder finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.withAntPattern("*/a/*")))
-			.excludeResource(ARootResource.with().path(AString.withAntPattern("*/a/*")))
+			.includeResource(ARootResource.with().path(AString.matchingAntPattern("*/a/*")))
+			.excludeResource(ARootResource.with().path(AString.matchingAntPattern("*/a/*")))
 			.build();
 			
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -270,7 +270,7 @@ public class ClassFinderTest {
 	@Test
 	public void test_filter_anonymous(){
 		ClassFinder finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.withAntPattern("*/c/*")))
+			.includeResource(ARootResource.with().path(AString.matchingAntPattern("*/c/*")))
 			.excludeAnonymous()
 			.build();
 		
@@ -282,7 +282,7 @@ public class ClassFinderTest {
 	@Test
 	public void test_filter_inner_class(){
 		ClassFinder finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.withAntPattern("*/d/*")))
+			.includeResource(ARootResource.with().path(AString.matchingAntPattern("*/d/*")))
 			.excludeInner()
 			.build();
 		

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.codemucker.jmatch.Matcher;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 
 /**
  * Instead of returning lists of things, use this instead. This provides support for
@@ -21,12 +22,28 @@ public interface FindResult<T> extends Iterable<T> {
 	public List<T> toList();
 
 	/**
-	 * Return a new view over the current results using the given filter
-	 * @param matcher used to filter the original results
+	 * Return a new view over the current results using the given filter. Anything that matches
+	 * the filter is kept, non matching items are removed
+	 * @param matcher used to filter the original results. Return true if the item should be retained
 	 * @return
 	 */
 	public FindResult<T> filter(Matcher<T> matcher);
 	public FindResult<T> filter(Matcher<T> matcher, MatchListener<? super T> listener);
+	
+	/**
+	 * Return a new view over the current results using the given predicate. If the predicate
+	 * return true for a given item it is retained, else it is excluded
+	 * @param predicate used to filter the original results. Return true if the item should be retained
+	 * @return
+	 */
+	public FindResult<T> filter(Predicate<T> predicate);
+
+	/**
+	 * Return a new view over the current results using the given filter. If the filter
+	 * returns true for a given item it is retained, else it is excluded
+	 * @param filter used to filter the original results. Return true if the item should be retained
+	 * @return
+	 */
 	public FindResult<T> filter(Filter<T> filter);
 	
 	public <B> FindResult<B> transform(Function<T, B> transformFunc);
@@ -44,15 +61,6 @@ public interface FindResult<T> extends Iterable<T> {
 	
 	public static interface KeyProvider<K,V> {
 		public K getKeyFor(V value);
-	}
-	
-	/**
-	 * Be notified of matches and misses when filtering
-	 * @param <T>
-	 */
-	public interface MatchListener<T>{
-		public void onMatched(T result);
-		public void onIgnored(T result);
 	}
 	
 	public interface Filter<T> extends Matcher<T>, MatchListener<T>{

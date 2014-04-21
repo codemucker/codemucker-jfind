@@ -6,23 +6,24 @@ import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Predicate;
 
-public class MatcherToFindFilterAdapter<T> extends AbstractNotNullMatcher<T> implements FindResult.Filter<T> {
+public class PredicateToFindFilterAdapter<T> extends AbstractNotNullMatcher<T> implements FindResult.Filter<T> {
 	
-	private final Matcher<T> matcher;
+	private final Predicate<T> predicate;
 
-	public static <T> FindResult.Filter<T> from(Matcher<T> matcher){
-		return new MatcherToFindFilterAdapter<T>(matcher);
+	public static <T> FindResult.Filter<T> from(Predicate<T> predicate){
+		return new PredicateToFindFilterAdapter<T>(predicate);
 	}
 	
-	private MatcherToFindFilterAdapter(Matcher<T> matcher){
-		Preconditions.checkNotNull(matcher, "expect non null matcher");
-		this.matcher = matcher;
+	private PredicateToFindFilterAdapter(Predicate<T> predicate){
+		Preconditions.checkNotNull(predicate, "expect non null predicate");
+		this.predicate = predicate;
 	}
 	
 	@Override
 	public boolean matchesSafely(T found, MatchDiagnostics ctxt) {
-		return ctxt.TryMatch(found,matcher);
+		return predicate.apply(found);
 	}
 
 	@Override
@@ -39,10 +40,9 @@ public class MatcherToFindFilterAdapter<T> extends AbstractNotNullMatcher<T> imp
 	public void onError(Object record, Exception e) throws Exception { 
 		throw e;
 	}
-	
 	@Override
 	public void describeTo(Description desc) {
 		super.describeTo(desc);
-		matcher.describeTo(desc);
+		desc.text("predicate", predicate);
 	}
 }

@@ -67,12 +67,12 @@ public class AResource extends PropertyMatcher<RootResource> {
 	}
 
 	public AResource pathMatchingAntPattern(String antPattern) {
-		path(AString.withAntPattern(antPattern));
+		path(AString.matchingAntPattern(antPattern));
 		return this;
 	}
 
 	public AResource pathMatchingRegex(Pattern pattern) {
-		path(AString.withPattern(pattern));
+		path(AString.matchingRegex(pattern));
 		return this;
 	}
 	

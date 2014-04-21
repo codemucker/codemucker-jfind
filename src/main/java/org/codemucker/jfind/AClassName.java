@@ -37,17 +37,17 @@ public class AClassName extends ObjectMatcher<String> {
 	}
     
     public AClassName nameAntPatternMatch(final String nameAntPattern){
-    	addMatcher(AString.withAntPattern(nameAntPattern));
+    	addMatcher(AString.matchingAntPattern(nameAntPattern));
     	return this;
     }
 
     public AClassName nameRegexMatch(final String namePattern){
-    	addMatcher(AString.withPattern(namePattern));
+    	addMatcher(AString.matchingRegex(namePattern));
     	return this;
     }
 
     public AClassName nameRegexMatch(Pattern pattern){
-    	addMatcher(AString.withPattern(pattern));
+    	addMatcher(AString.matchingRegex(pattern));
     	return this;
     }
     

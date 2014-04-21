@@ -15,6 +15,7 @@ import org.codemucker.jmatch.Matcher;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
 
 public class DefaultFindResult<T> implements FindResult<T> {
 
@@ -84,6 +85,11 @@ public class DefaultFindResult<T> implements FindResult<T> {
 	@Override
     public FindResult<T> filter(Matcher<T> matcher) {
 		return filter(MatcherToFindFilterAdapter.from(matcher));
+    }
+
+	@Override
+    public FindResult<T> filter(Predicate<T> predicate) {
+		return filter(PredicateToFindFilterAdapter.from(predicate));
     }
 
 	@Override
