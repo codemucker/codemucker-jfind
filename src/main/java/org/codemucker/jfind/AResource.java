@@ -95,7 +95,7 @@ public class AResource extends PropertyMatcher<RootResource> {
 
 		@Override
 		public boolean matchesSafely(RootResource actual,MatchDiagnostics diag) {
-			return actual != null && diag.TryMatch(actual.getRelPath(), pathMatcher);
+			return actual != null && diag.tryMatch(this,actual.getRelPath(), pathMatcher);
 		}
 		
 		@Override

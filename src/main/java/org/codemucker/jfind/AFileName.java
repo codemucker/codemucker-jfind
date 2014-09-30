@@ -14,6 +14,7 @@ public class AFileName extends ObjectMatcher<String> {
 	}
 	
 	private AFileName(){
+	    super(String.class);
 	}
 	
     public static Matcher<String> any() {

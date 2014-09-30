@@ -75,7 +75,7 @@ public class AMethod extends PropertyMatcher<Method>{
 		addMatcher(new AbstractMatcher<Method>() {
 			@Override
 			protected boolean matchesSafely(Method found, MatchDiagnostics diag) {
-				return diag.TryMatch(found.getParameterTypes().length, matcher);
+				return diag.tryMatch(this,found.getParameterTypes().length, matcher);
 			}
 			
 			@Override

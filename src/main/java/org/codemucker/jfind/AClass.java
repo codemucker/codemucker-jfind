@@ -53,6 +53,7 @@ public class AClass extends ObjectMatcher<Class<?>> {
 	}
 	
 	private AClass() {
+	    super(Class.class);
 	}
 
 	@SafeVarargs

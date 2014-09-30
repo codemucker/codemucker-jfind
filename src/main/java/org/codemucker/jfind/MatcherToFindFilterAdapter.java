@@ -22,7 +22,7 @@ public class MatcherToFindFilterAdapter<T> extends AbstractNotNullMatcher<T> imp
 	
 	@Override
 	public boolean matchesSafely(T found, MatchDiagnostics ctxt) {
-		return ctxt.TryMatch(found,matcher);
+		return ctxt.tryMatch(this,found,matcher);
 	}
 
 	@Override

@@ -14,6 +14,7 @@ public class AClassName extends ObjectMatcher<String> {
 	}
 	
 	private AClassName(){
+	    super(String.class);
 	}
 	
     public static Matcher<String> any() {
