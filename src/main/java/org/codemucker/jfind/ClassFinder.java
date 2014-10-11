@@ -56,11 +56,11 @@ public class ClassFinder {
 	private final FinderIgnoredCallback ignoredCallback;
 	private final FinderMatchedCallback matchedCallback;
 
-	public static Builder newBuilder(){
+	public static Builder withBuilder(){
 		return new Builder();
 	}
 	
-	public static Criteria newCriteria(){
+	public static Criteria withCriteria(){
 		return new Criteria();
 	}
 

@@ -78,6 +78,19 @@ public class RootResource  {
 		return root.getResourceOutputStream(relPath);
 	}
 	
+    /**
+     * Return information about the full path of this resource
+     * 
+     * The returned value does not have to represent a file or url path, it it merely informative for debug and errors messages
+     * 
+     * Delegates to {@link Root#getFullPathInfo(String)}
+     *  
+     * @return the full path info, not machine readable
+     */
+	public String getFullPathInfo() {
+        return getRoot().getFullPathInfo(relPath);
+    }
+    
 	public Root getRoot() {
 		return root;
 	}

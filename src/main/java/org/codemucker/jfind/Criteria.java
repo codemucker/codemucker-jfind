@@ -35,7 +35,7 @@ public class Criteria {
 	private final IncludeExcludeMatcherBuilder<String> classNames = IncludeExcludeMatcherBuilder.builder();
 	private final IncludeExcludeMatcherBuilder<String> resourceNames = IncludeExcludeMatcherBuilder.builder();
 	
-	private ClassFinder.Builder builder = ClassFinder.newBuilder();
+	private ClassFinder.Builder builder = ClassFinder.withBuilder();
 
 	public ClassFinder build() {
 		Builder copy = builder.copyOf();
@@ -61,32 +61,37 @@ public class Criteria {
 		return this;
 	}
 
-	public Criteria addRoots(Root root){
+	public Criteria root(Root root){
 		rootsBuilder.root(root);
 		return this;
 	}
 	
-	public Criteria setRoots(Iterable<Root> roots){
+	public Criteria roots(Iterable<Root> roots){
 		rootsBuilder = Roots.with(roots);
 		return this;
 	}
 	
-	public Criteria setIgnoreCallback(FinderIgnoredCallback callback){
+    public Criteria ignoreCallbackLogging() {
+        ignoreCallback(new LoggingIgnoredCallback());
+        return this;
+    }
+    
+	public Criteria ignoreCallback(FinderIgnoredCallback callback){
 		builder.setIgnoredCallback(callback);
 		return this;
 	}
 	
-	public Criteria setMatchCallback(FinderMatchedCallback callback){
+	public Criteria matchCallback(FinderMatchedCallback callback){
 		builder.setMatchedCallback(callback);
 		return this;
 	}
 	
-	public Criteria setErrorCallback(FinderErrorCallback callback){
+	public Criteria errorCallback(FinderErrorCallback callback){
 		builder.setErrorCallback(callback);
 		return this;
 	}
 
-	public Criteria setClassLoader(ClassLoader classLoader) {
+	public Criteria classLoader(ClassLoader classLoader) {
     	builder.setClassLoader(classLoader);
     	return this;
     }

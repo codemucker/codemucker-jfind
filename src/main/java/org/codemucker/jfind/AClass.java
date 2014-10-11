@@ -121,6 +121,13 @@ public class AClass extends ObjectMatcher<Class<?>> {
 		return this;
 	}
 	
+	public AClass isPublicConcreteClass() {
+	    isNotAnonymous();
+	    isNotInterface();
+	    isNotInner();
+	    return this;
+    }
+	
 	public AClass notEnum() {
 		addMatcher(Logical.not(MATCHER_ENUM));
 		return this;

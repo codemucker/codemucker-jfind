@@ -46,6 +46,12 @@ public class ArchiveRoot implements Root {
 	    return path.exists() && path.canRead() && getZip().getEntry(relPath) != null;
     }
 	
+
+    @Override
+    public String getFullPathInfo(String relPath) {
+        return path.getAbsolutePath() + "!" + relPath;
+    }
+    
 	@Override
 	public OutputStream getResourceOutputStream(String relPath) throws IOException {
 		throw new IOException("Can't don't support writing a resources to an archive");
@@ -190,4 +196,5 @@ public class ArchiveRoot implements Root {
 			return false;
 		return true;
 	}
+
 }

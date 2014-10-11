@@ -30,6 +30,16 @@ public interface Root {
     	SRC, BINARY, MIXED;
     }
 
+    /**
+     * Return information about the full path of the given relative resource. 
+     * 
+     * The returned value does not have to represent a file or url path, it it merely informative for debug and errors messages
+     * 
+     * @param relPath the relative path of the resource within this root
+     * @return the full path info, not machine readable
+     */
+    String getFullPathInfo(String relPath);
+    
 	/**
 	 * Return a stream to read the given relative stream from
 	 * @param relPath
@@ -58,4 +68,5 @@ public interface Root {
 	RootContentType getContentType();
 
 	void accept(RootVisitor visitor);
+
 }

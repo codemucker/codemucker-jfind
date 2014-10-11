@@ -106,6 +106,11 @@ public class DirectoryRoot implements Root {
 	private File getByRelPath(String relpath){
 		return new File(baseDir.getAbsolutePath(),relpath);
 	}
+	
+	@Override
+	public String getFullPathInfo(String relPath){
+	    return new File(baseDir.getAbsolutePath(),relPath).getAbsolutePath();
+	}
 
 	@Override
 	public String getPathName(){
