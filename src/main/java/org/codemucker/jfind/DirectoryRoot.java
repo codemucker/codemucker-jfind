@@ -82,7 +82,7 @@ public class DirectoryRoot implements Root {
 			}
 			return new FileOutputStream(f);
 		} else {
-			throw new IOException(String.format("Couldn't write resource path '%s' for root %s",relPath,this));
+			throw new IOException(String.format("Couldn't write resource path '%s' for root %s as basedir %s doesn't exist",relPath,this,baseDir));
 		}
 	}
 	
@@ -112,10 +112,10 @@ public class DirectoryRoot implements Root {
 	    return new File(baseDir.getAbsolutePath(),relPath).getAbsolutePath();
 	}
 
-	@Override
-	public String getPathName(){
-		return baseDir.getAbsolutePath();
-	}
+    @Override
+    public String getPathName() {
+        return PathUtil.toForwardSlashes(baseDir.getAbsolutePath());
+    }
 	
 	public File getPath(){
 		return baseDir;
@@ -212,4 +212,14 @@ public class DirectoryRoot implements Root {
 	private static boolean isCancelled(){
 		return Thread.interrupted();
 	}
+
+    @Override
+    public boolean isArchive() {
+        return false;
+    }
+
+    @Override
+    public boolean isDirectory() {
+        return true;
+    }
 }

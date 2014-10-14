@@ -6,7 +6,11 @@ import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,31 +111,86 @@ public final class Roots  {
 			return copy;
 		}
 		
-		private Set<File> findClassPathDirs() {
-			Set<File> files = newLinkedHashSet();
+		/**
+		 * Try our hardest to find all the class path roots. 
+		 * 
+		 * <p>Walk both the classloaders and the lookup the system class path property
+		 * as tools like maven set the system property but don't expose the class loader for dependencies, while tools like eclipse don't
+		 * update the system property but does provide a useful class loader hierarchy</p>
+		 * 
+		 * @return all the paths to the jars, sources etc which could be found, in an attempt at the same order as what is used by the classloaders (though not guaranteed)
+		 */
+		private Collection<File> findClassPathDirs() {
+		    Map<String,File> files = newLinkedHashMap();
+		    findClassPathDirsFromClassLoaders(files);
+		    findClassPathDirsFromSystemProperty(files);
+		    return files.values();
+		}
 
-			String classpath = System.getProperty("java.class.path");
-			String sep = System.getProperty("path.separator");
-			String[] paths = classpath.split(sep);
-	
-			Collection<String> fullPathNames = newArrayList();
-			for (String path : paths) {
-				try {
-					File f = new File(path);
-					if (f.exists() & f.canRead()) {
-						String fullPath = f.getCanonicalPath();
-						if (!fullPathNames.contains(fullPath)) {
-							files.add(f);
-							fullPathNames.add(fullPath);
-						}
-					}
-				} catch (IOException e) {
-					throw new ClassFinderException("Error trying to resolve pathname " + path);
-				}
-			}
-			return files;
-		}	
-		
+        private void findClassPathDirsFromClassLoaders(Map<String, File> files) {
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            List<URL> urls = new ArrayList<>();
+
+            while (classloader != null) {
+                if (classloader instanceof URLClassLoader) {
+                    URLClassLoader ucl = (URLClassLoader) classloader;
+                    for (URL url : ucl.getURLs()) {
+                        urls.add(url);
+                        // System.out.println("Roots:url=" + url.getPath());
+                    }
+                } else {
+                    log("ignoring classloader of type:" + classloader.getClass().getName());
+                }
+                classloader = classloader.getParent();
+            }
+            Collections.reverse(urls);
+
+            for (URL url : urls) {
+                try {
+                    if ("file".equals(url.getProtocol())) {
+                        File f = new File(url.getPath());
+                        if (f.exists() & f.canRead()) {
+                            String fullPath = f.getCanonicalPath();
+                            if (!files.containsKey(fullPath)) {
+                                files.put(fullPath, f);
+                            }
+                        } else {
+                            log("can't read url:" + url);
+                        }
+                    } else {
+                        log("skipping url:" + url);
+                    }
+                } catch (IOException e) {
+                    throw new JFindException("Error trying to resolve pathname " + url);
+                }
+            }
+        }
+
+        private static void log(String msg) {
+            //System.out.println(Roots.class.getSimpleName() + ": [DEBUG] " + msg);
+        }
+
+        private void findClassPathDirsFromSystemProperty(Map<String, File> files) {
+
+            String classpath = System.getProperty("java.class.path");
+            String sep = System.getProperty("path.separator");
+            String[] paths = classpath.split(sep);
+
+            for (String path : paths) {
+                try {
+                    File f = new File(path);
+                    if (f.exists() & f.canRead()) {
+                        String fullPath = f.getCanonicalPath();
+                        if (!files.containsKey(fullPath)) {
+                            files.put(fullPath, f);
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new JFindException("Error trying to resolve pathname " + path);
+                }
+            }
+        }
+
 		public Builder projectResolver(ProjectResolver resolver){
 			this.projectResolver = resolver;
 			return this;

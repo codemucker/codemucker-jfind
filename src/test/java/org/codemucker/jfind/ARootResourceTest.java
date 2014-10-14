@@ -1,5 +1,6 @@
 package org.codemucker.jfind;
 
+import org.codemucker.jfind.matcher.ARootResource;
 import org.codemucker.jtest.ProjectFinder;
 import org.junit.Assert;
 import org.junit.Test;

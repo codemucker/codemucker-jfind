@@ -3,10 +3,10 @@ package org.codemucker.jfind;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.log4j.Logger;
-import org.codemucker.jfind.ClassFinder.FinderErrorCallback;
+import org.codemucker.jfind.JFind.ErrorCallback;
 
 
-public class LoggingErrorCallback implements FinderErrorCallback {
+public class LoggingErrorCallback implements ErrorCallback {
 	private final Logger logger;
 	
 	public LoggingErrorCallback(){
@@ -23,7 +23,7 @@ public class LoggingErrorCallback implements FinderErrorCallback {
 	}
 	
 	@Override
-	public void onClassError(String fullClassname, Exception e) {
+	public void onClassError(RootResource resource,String fullClassname, Exception e) {
 		logger.warn("error handling class " + fullClassname,e);
 	}
 	

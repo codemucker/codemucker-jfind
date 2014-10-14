@@ -1,28 +1,29 @@
 package org.codemucker.jfind;
 
-import org.codemucker.jfind.ClassFinder.FinderFilter;
+import org.codemucker.jfind.JFind.Filter;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.Matcher;
+import org.codemucker.lang.IBuilder;
 
-public class ClassFinderFilter implements FinderFilter {
+public class JFindFilter implements Filter{
 	
-	private final Matcher<Root> classPathMatcher;
+	private final Matcher<Root> rootMatcher;
 	private final Matcher<RootResource> resourceMatcher;
 	private final Matcher<String> classNameMatcher;
 	private final Matcher<Class<?>> classMatcher;
 	
-	public static ClassFinderFilter.Builder newBuilder(){
+	public static Builder with(){
 		return new Builder();
 	}
 	
-	private ClassFinderFilter(
+	private JFindFilter(
 			Matcher<Root> classPathMatcher
 			, Matcher<RootResource> resourceMatcher
 			, Matcher<String> resourceNameMatcher
 			, Matcher<String> classNameMatcher
 			, Matcher<Class<?>> classMatcher
 			){
-		this.classPathMatcher = anyIfNull(classPathMatcher);
+		this.rootMatcher = anyIfNull(classPathMatcher);
 		this.resourceMatcher = anyIfNull(resourceMatcher);
 		this.classNameMatcher = anyIfNull(classNameMatcher);
 		this.classMatcher = anyIfNull(classMatcher);
@@ -43,17 +44,17 @@ public class ClassFinderFilter implements FinderFilter {
 	}
 	
 	@Override
-	public boolean isIncludeClassPath(Root root) {
-		return classPathMatcher.matches(root);
+	public boolean isIncludeRoot(Root root) {
+		return rootMatcher.matches(root);
 	}
 	
 	@Override
-	public boolean isIncludeClassName(String className) {
+	public boolean isIncludeClassname(RootResource resource,String className) {
 		return classNameMatcher.matches(className);
 	}
 	
 	@Override
-	public boolean isIncludeClass(Class<?> classToMatch) {
+	public boolean isIncludeClass(RootResource resource,Class<?> classToMatch) {
 		return classMatcher.matches(classToMatch);
 	}
 	
@@ -67,49 +68,46 @@ public class ClassFinderFilter implements FinderFilter {
 	    return true;
     }
 	
-	public static class Builder {
-		private Matcher<Root> classPathMatcher;
+	public static class Builder implements IBuilder<JFindFilter>{
+	    
+		private Matcher<Root> rootMatcher;
 		private Matcher<RootResource> resourceMatcher;
-		private Matcher<String> resourceNameMatcher;
+		//private Matcher<String> resourceNameMatcher;
 		private Matcher<String> classNameMatcher;
 		private Matcher<Class<?>> classMatcher;
 		
-		public ClassFinderFilter build(){
-			return new ClassFinderFilter(
-				classPathMatcher
+		public JFindFilter build(){
+			return new JFindFilter(
+				rootMatcher
 				, resourceMatcher
-				, resourceNameMatcher
+				, null//resourceNameMatcher
 				, classNameMatcher
 				, classMatcher
 			);
 		}
 		
-		public Builder setClassMatcher(Matcher<Class<?>> classMatcher) {
+		public Builder classMatches(Matcher<Class<?>> classMatcher) {
         	this.classMatcher = classMatcher;
         	return this;
         }
 
-		public Builder setClassPathMatcher(Matcher<Root> classPathMatcher) {
-        	this.classPathMatcher = classPathMatcher;
+		public Builder rootMatches(Matcher<Root> matcher) {
+        	this.rootMatcher = matcher;
         	return this;
         }
 		
-		public Builder anyClassMatchers(Matcher<Class<?>>... matchers) {
-        	this.classMatcher = AClass.any(matchers);
-        	return this;
-        }
-		
-		public Builder setClassNameMatcher(Matcher<String> classNameMatcher) {
-        	this.classNameMatcher = classNameMatcher;
-        	return this;
+		public Builder classNameMatches(Matcher<String> classNameMatcher) {
+		    this.classNameMatcher = classNameMatcher;
+		    return this;
 		}
-
+		
+		/*
 		public Builder setResourceNameMatcher(Matcher<String> fileNameMatcher) {
         	this.resourceNameMatcher = fileNameMatcher;
         	return this;
 		}
-
-		public Builder setResourceMatcher(Matcher<RootResource> resourceMatcher) {
+*/
+		public Builder resourceMatches(Matcher<RootResource> resourceMatcher) {
         	this.resourceMatcher = resourceMatcher;
         	return this;
 		}

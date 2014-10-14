@@ -28,7 +28,7 @@ public interface FindResult<T> extends Iterable<T> {
 	 * @return
 	 */
 	public FindResult<T> filter(Matcher<T> matcher);
-	public FindResult<T> filter(Matcher<T> matcher, MatchListener<? super T> listener);
+	public FindResult<T> filter(Matcher<T> matcher, JFindMatchListener<? super T> listener);
 	
 	/**
 	 * Return a new view over the current results using the given predicate. If the predicate
@@ -63,6 +63,6 @@ public interface FindResult<T> extends Iterable<T> {
 		public K getKeyFor(V value);
 	}
 	
-	public interface Filter<T> extends Matcher<T>, MatchListener<T>{
+	public interface Filter<T> extends Matcher<T>, JFindMatchListener<T>{
 	}
 }

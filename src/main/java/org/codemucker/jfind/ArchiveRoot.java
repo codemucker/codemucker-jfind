@@ -80,9 +80,9 @@ public class ArchiveRoot implements Root {
 				zip = new ZipFile(path);
 				cachedZip.set(zip);
 			} catch (ZipException e) {
-				throw new ClassFinderException("Error opening archive file:" + path.getAbsolutePath(), e);
+				throw new JFindException("Error opening archive file:" + path.getAbsolutePath(), e);
 			} catch (IOException e) {
-				throw new ClassFinderException("Error opening archive file:" + path.getAbsolutePath(), e);
+				throw new JFindException("Error opening archive file:" + path.getAbsolutePath(), e);
 			}
 		}
 		return zip;
@@ -90,7 +90,7 @@ public class ArchiveRoot implements Root {
 	
 	@Override
 	public String getPathName(){
-		return path.getAbsolutePath();
+		return PathUtil.toForwardSlashes(path.getAbsolutePath());
 	}
 
 	@Override
@@ -133,6 +133,7 @@ public class ArchiveRoot implements Root {
             } catch (IOException e) {
             	//ignore
             }
+			cachedZip.set(null);
 		}
 	}
 	
@@ -196,5 +197,15 @@ public class ArchiveRoot implements Root {
 			return false;
 		return true;
 	}
+
+    @Override
+    public boolean isArchive() {
+        return true;
+    }
+
+    @Override
+    public boolean isDirectory() {
+        return false;
+    }
 
 }

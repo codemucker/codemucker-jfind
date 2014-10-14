@@ -98,7 +98,7 @@ public class DefaultFindResult<T> implements FindResult<T> {
 	}
 	
 	@Override
-    public FindResult<T> filter(Matcher<T> matcher, MatchListener<? super T> listener) {
+    public FindResult<T> filter(Matcher<T> matcher, JFindMatchListener<? super T> listener) {
 		return from(FilteringIterator.from(source.iterator(), matcher, listener));
     }
 
@@ -140,13 +140,13 @@ public class DefaultFindResult<T> implements FindResult<T> {
 
 		private final Iterator<T> source;
 		private final Matcher<T> matcher;
-		private final MatchListener<? super T> listener;
+		private final JFindMatchListener<? super T> listener;
 		
 		private T nextItem;
 		
 		private boolean init = true;
 
-		static <T> FilteringIterator<T> from(Iterator<T> source, Matcher<T> matcher, MatchListener<? super T> listener){
+		static <T> FilteringIterator<T> from(Iterator<T> source, Matcher<T> matcher, JFindMatchListener<? super T> listener){
 			return new FilteringIterator<T>(source,matcher, listener);
 		}
 		
@@ -154,7 +154,7 @@ public class DefaultFindResult<T> implements FindResult<T> {
 		 * @param source the backing iterator which provides the item to iterate over
 		 * @param filter the filter which filters the source iterator
 		 */
-		public FilteringIterator(Iterator<T> source, Matcher<T> matcher, MatchListener<? super T> listener) {
+		public FilteringIterator(Iterator<T> source, Matcher<T> matcher, JFindMatchListener<? super T> listener) {
 			checkNotNull("soure", source);
 			checkNotNull("matcher", matcher);
 			checkNotNull("listener", listener);

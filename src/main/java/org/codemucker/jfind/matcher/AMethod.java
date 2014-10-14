@@ -1,4 +1,4 @@
-package org.codemucker.jfind;
+package org.codemucker.jfind.matcher;
 
 import java.lang.reflect.Method;
 
@@ -9,10 +9,8 @@ import org.codemucker.jmatch.Description;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
-import org.codemucker.jmatch.ObjectMatcher;
-import org.codemucker.jmatch.PropertyMatcher;
 
-public class AMethod extends PropertyMatcher<Method>{
+public class AMethod extends AbstractModiferMatcher<AMethod,Method>{
 
 	public AMethod() {
 		super(Method.class);
@@ -26,6 +24,10 @@ public class AMethod extends PropertyMatcher<Method>{
 		return new AMethod();
 	}
 	
+    @Override
+    protected int getModifier(Method instance) {
+        return instance.getModifiers();
+    }
 	
 	public AMethod isGetter(){
 		name(Logical.any(AString.matchingAntPattern("get*"),AString.matchingAntPattern("is*")));
@@ -49,7 +51,17 @@ public class AMethod extends PropertyMatcher<Method>{
 		return this;
 	}
 	
-	public AMethod isVoid(final boolean b){
+	public AMethod isVoidReturn(){
+	    isVoidReturn(true);
+	    return this;
+	}
+	
+	public AMethod isNotVoidReturn(){
+        isVoidReturn(false);
+        return this;
+    }
+    
+	public AMethod isVoidReturn(final boolean b){
 		addMatcher(new AbstractMatcher<Method>() {
 			@Override
 			protected boolean matchesSafely(Method found, MatchDiagnostics diag) {
@@ -59,7 +71,7 @@ public class AMethod extends PropertyMatcher<Method>{
 			
 			@Override
 			public void describeTo(Description desc) {
-				desc.text("isVoid", b);
+				desc.text("is" + (b?"":" not")+ " void");
 			}
 		});
 		return this;
@@ -80,11 +92,10 @@ public class AMethod extends PropertyMatcher<Method>{
 			
 			@Override
 			public void describeTo(Description desc) {
-				desc.text("numArgs", matcher);
+				desc.text("numArgs " + matcher);
 			}
 		});
 		return this;
 	}
-	
-	
+
 }

@@ -15,17 +15,19 @@
  */
 package org.codemucker.jfind;
 
-public class ClassFinderException extends RuntimeException {
+public class JFindException extends RuntimeException {
 
-	public ClassFinderException(String message, Throwable cause) {
+    private static final long serialVersionUID = 1L;
+
+    public JFindException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
-	public ClassFinderException(String message) {
+	public JFindException(String message) {
 		super(message);
 	}
 
-	public ClassFinderException(String message, Object... args) {
+	public JFindException(String message, Object... args) {
 		super(String.format(message, args));
 	}
 

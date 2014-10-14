@@ -69,4 +69,7 @@ public interface Root {
 
 	void accept(RootVisitor visitor);
 
+	public boolean isArchive();
+	public boolean isDirectory();
+    
 }

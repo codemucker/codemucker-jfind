@@ -3,10 +3,10 @@ package org.codemucker.jfind;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.log4j.Logger;
-import org.codemucker.jfind.ClassFinder.FinderIgnoredCallback;
+import org.codemucker.jfind.JFind.IgnoredCallback;
 
 
-public class LoggingIgnoredCallback implements FinderIgnoredCallback {
+public class LoggingIgnoredCallback implements IgnoredCallback {
 	private final Logger logger;
 	
 	public LoggingIgnoredCallback(){
@@ -28,18 +28,18 @@ public class LoggingIgnoredCallback implements FinderIgnoredCallback {
 	}
 
 	@Override
-    public void onClassNameIgnored(String className) {
+    public void onClassNameIgnored(RootResource resource,String className) {
 		logger.info("ignoring class named:" + className);
 	}
 
 	@Override
-    public void onClassIgnored(Class<?> ignoredClass) {
+    public void onClassIgnored(RootResource resource,Class<?> ignoredClass) {
 		logger.info("ignoring class:" + ignoredClass.getName());
 		
 	}
 
 	@Override
-    public void onClassPathIgnored(Root root) {
+    public void onRootIgnored(Root root) {
 		logger.info("ignoring class path:" + root);
 	}
 

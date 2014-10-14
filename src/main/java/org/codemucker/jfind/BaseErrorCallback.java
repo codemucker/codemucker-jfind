@@ -1,15 +1,15 @@
 package org.codemucker.jfind;
 
-import org.codemucker.jfind.ClassFinder.FinderErrorCallback;
+import org.codemucker.jfind.JFind.ErrorCallback;
 
-public class BaseErrorCallback implements FinderErrorCallback {
+public class BaseErrorCallback implements ErrorCallback {
 
 	@Override
     public void onResourceError(RootResource resource, Exception e) {
     }
 
 	@Override
-    public void onClassError(String fullClassname, Exception e) {
+    public void onClassError(RootResource resource,String fullClassname, Exception e) {
     }
 
 	@Override

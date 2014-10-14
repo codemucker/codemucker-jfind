@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.codemucker.jfind.matcher.ARootResource;
 import org.codemucker.jmatch.AList;
 import org.junit.Test;
 

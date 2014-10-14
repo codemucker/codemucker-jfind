@@ -3,10 +3,10 @@ package org.codemucker.jfind;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.log4j.Logger;
-import org.codemucker.jfind.ClassFinder.FinderMatchedCallback;
+import org.codemucker.jfind.JFind.MatchedCallback;
 
 
-public class LoggingMatchedCallback implements FinderMatchedCallback {
+public class LoggingMatchedCallback implements MatchedCallback {
 	private final Logger logger;
 	
 	public LoggingMatchedCallback(){
@@ -28,17 +28,17 @@ public class LoggingMatchedCallback implements FinderMatchedCallback {
 	}
 
 	@Override
-	public void onClassNameMatched(String className) {
+	public void onClassNameMatched(RootResource resource,String className) {
 		logger.info("matched className:" + className);
 	}
 
 	@Override
-	public void onClassPathMatched(Root root) {
+	public void onRootMatched(Root root) {
 		logger.info("matched class path root:" + root);
 	}
 
 	@Override
-	public void onClassMatched(Class<?> matchedClass) {
+	public void onClassMatched(RootResource resource,Class<?> matchedClass) {
 		logger.info("matched class:" + matchedClass.getName());
 	}
 

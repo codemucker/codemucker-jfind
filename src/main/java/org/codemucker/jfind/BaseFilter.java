@@ -1,11 +1,11 @@
 package org.codemucker.jfind;
 
-import org.codemucker.jfind.ClassFinder.FinderFilter;
+import org.codemucker.jfind.JFind.Filter;
 
-public class BaseFilter implements FinderFilter {
+public class BaseFilter implements Filter {
 
 	@Override
-    public boolean isIncludeClassPath(Root root) {
+    public boolean isIncludeRoot(Root root) {
         return true;
     }
 
@@ -20,12 +20,12 @@ public class BaseFilter implements FinderFilter {
     }
 
 	@Override
-    public boolean isIncludeClassName(String className) {
+    public boolean isIncludeClassname(RootResource resource,String className) {
         return true;
     }
 
 	@Override
-    public boolean isIncludeClass(Class<?> classToMatch) {
+    public boolean isIncludeClass(RootResource resource,Class<?> classToMatch) {
         return true;
     }
 

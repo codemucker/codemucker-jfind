@@ -1,7 +1,8 @@
-package org.codemucker.jfind;
+package org.codemucker.jfind.matcher;
 
 import java.util.regex.Pattern;
 
+import org.codemucker.jfind.RootResource;
 import org.codemucker.jmatch.AString;
 import org.codemucker.jmatch.AbstractMatcher;
 import org.codemucker.jmatch.Description;
@@ -37,7 +38,7 @@ public class AResource extends PropertyMatcher<RootResource> {
 	}
 
 	public AResource extension(String extension) {
-		pathMatchingAntPattern("*." + extension);
+		pathMatchingAntPattern("**." + extension);
 		return this;
 	}
 
@@ -51,8 +52,8 @@ public class AResource extends PropertyMatcher<RootResource> {
 		return this;
 	}
 	
-	public AResource nameAntPatternMatch(String antPattern) {
-		pathMatchingAntPattern("*/" + antPattern);
+	public AResource nameMatchingAntPattern(String antPattern) {
+		pathMatchingAntPattern("**/" + antPattern);
 		return this;
 	}
 
@@ -100,9 +101,9 @@ public class AResource extends PropertyMatcher<RootResource> {
 		
 		@Override
 		public void describeTo(Description desc) {
-			super.describeTo(desc);
-			desc.text("not null resouce");
-			desc.value("relPath", pathMatcher);
+			//super.describeTo(desc);
+			//desc.text("not null resouce");
+			desc.value("resource with relative path", pathMatcher);
 		}
 		
 	}

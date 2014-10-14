@@ -1,7 +1,8 @@
-package org.codemucker.jfind;
+package org.codemucker.jfind.matcher;
 
 import java.util.List;
 
+import org.codemucker.jfind.RootResource;
 import org.codemucker.jmatch.AProperty;
 import org.codemucker.jmatch.AString;
 import org.codemucker.jmatch.AbstractNotNullMatcher;

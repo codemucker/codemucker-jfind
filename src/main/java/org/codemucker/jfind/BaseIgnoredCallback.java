@@ -1,8 +1,8 @@
 package org.codemucker.jfind;
 
-import org.codemucker.jfind.ClassFinder.FinderIgnoredCallback;
+import org.codemucker.jfind.JFind.IgnoredCallback;
 
-public class BaseIgnoredCallback implements FinderIgnoredCallback {
+public class BaseIgnoredCallback implements IgnoredCallback {
 
 	@Override
     public void onArchiveIgnored(RootResource archiveFile) {
@@ -13,15 +13,15 @@ public class BaseIgnoredCallback implements FinderIgnoredCallback {
     }
 
 	@Override
-    public void onClassNameIgnored(String className) {
+    public void onClassNameIgnored(RootResource resource,String className) {
     }
 
 	@Override
-    public void onClassIgnored(Class<?> matchedClass) {
+    public void onClassIgnored(RootResource resource,Class<?> matchedClass) {
     }
 
 	@Override
-    public void onClassPathIgnored(Root root) {
+    public void onRootIgnored(Root root) {
     }
 
 	@Override

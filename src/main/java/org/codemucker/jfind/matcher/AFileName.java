@@ -1,4 +1,4 @@
-package org.codemucker.jfind;
+package org.codemucker.jfind.matcher;
 
 import java.util.regex.Pattern;
 

@@ -8,6 +8,7 @@ import java.util.Collection;
 
 import org.codemucker.jfind.a.TstBeanOne;
 import org.codemucker.jfind.b.TstBeanTwo;
+import org.codemucker.jfind.matcher.ARootResource;
 import org.codemucker.jmatch.AList;
 import org.codemucker.jtest.ProjectFinder;
 import org.junit.Test;

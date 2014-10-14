@@ -1,28 +1,34 @@
-package org.codemucker.jfind;
+package org.codemucker.jfind.matcher;
 
 import java.lang.annotation.Annotation;
 
 import org.codemucker.jmatch.AbstractNotNullMatcher;
+import org.codemucker.jmatch.Description;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
-import org.codemucker.jmatch.ObjectMatcher;
 
-import com.google.common.base.Objects;
-
-public class AClass extends ObjectMatcher<Class<?>> {
+public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 
 	public static final Matcher<Class<?>> MATCHER_ANONYMOUS = new AbstractNotNullMatcher<Class<?>>() {
 		@Override
 		public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 			return found.isAnonymousClass();
 		}
+		@Override
+        public void describeTo(Description desc) {
+            desc.text("is anonymous");
+        }
 	};
 	
 	public static final Matcher<Class<?>> MATCHER_ENUM = new AbstractNotNullMatcher<Class<?>>() {
 		@Override
 		public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 			return found.isEnum();
+		}
+		@Override
+		public void describeTo(Description desc) {
+		    desc.text("is enum");
 		}
 	};
 	
@@ -31,6 +37,10 @@ public class AClass extends ObjectMatcher<Class<?>> {
 		public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 			return found.isMemberClass();
 		}
+		@Override
+        public void describeTo(Description desc) {
+            desc.text("is inner class");
+        }
 	};
 
 	public static final Matcher<Class<?>> MATCHER_INTERFACE = new AbstractNotNullMatcher<Class<?>>() {
@@ -38,6 +48,10 @@ public class AClass extends ObjectMatcher<Class<?>> {
 		public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
 			return found.isInterface();
 		}
+		@Override
+        public void describeTo(Description desc) {
+            desc.text("is interface");
+        }
 	};
 	
 	/**
@@ -56,6 +70,11 @@ public class AClass extends ObjectMatcher<Class<?>> {
 	    super(Class.class);
 	}
 
+    @Override
+    protected int getModifier(Class<?> instance) {
+        return instance.getModifiers();
+    }
+	   
 	@SafeVarargs
     public static Matcher<Class<?>> any(final Matcher<Class<?>>... matchers) {
     	return Logical.any(matchers);
@@ -73,17 +92,7 @@ public class AClass extends ObjectMatcher<Class<?>> {
     public static Matcher<Class<?>> noClass() {
     	return Logical.none();
     }
-	
-    public AClass modifier(final int modifier){
-    	addMatcher(new AbstractNotNullMatcher<Class<?>>(){
-			@Override
-            public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
-	            return (found.getModifiers() & modifier) != 0;
-            }
-    	});
-    	return this;
-    }
-    
+
     /**
      * Expect a class to be a sub class, implementation of, or equal to the given superclass
      * @param superclass
@@ -102,14 +111,18 @@ public class AClass extends ObjectMatcher<Class<?>> {
 			}
 			
 			@Override
-			public String toString(){
-				return Objects.toStringHelper(this)
-					.add("subclass of", superclass)
-					.toString();
-			}
+	        public void describeTo(Description desc) {
+	            desc.value("is subclass of", superclass);
+	        }
 		});
 		return this;
 	}
+	
+    public AClass annotation(Class<? extends Annotation> annotation){
+        addMatcher(new ContainsAnnotationsMatcher(annotation));
+        return this;
+    }
+    
 	/**
 	 * Class must be marked with the given annotation
 	 * @param annotations
@@ -167,7 +180,7 @@ public class AClass extends ObjectMatcher<Class<?>> {
 		addMatcher(MATCHER_INTERFACE);
 		return this;
 	}
-	
+
 	private static class ContainsAnnotationsMatcher extends AbstractNotNullMatcher<Class<?>> {
 		private final Class<? extends Annotation>[] annotations;
 
@@ -186,5 +199,10 @@ public class AClass extends ObjectMatcher<Class<?>> {
 			}
 			return true;
 		}
+		
+		@Override
+        public void describeTo(Description desc) {
+            desc.value("contains all annotations", annotations);
+        }
 	}
 }

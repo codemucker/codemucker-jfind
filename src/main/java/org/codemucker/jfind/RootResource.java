@@ -19,7 +19,7 @@ public class RootResource  {
 
 	public RootResource(Root root, String relPath) {
 		this.root = checkNotNull(root,"expect class path root");
-		this.relPath = checkNotNull(relPath,"expect relative path");
+		this.relPath = PathUtil.toForwardSlashes(checkNotNull(relPath,"expect relative path"));
 		this.depth = countForwardSlashes(relPath);
 	}
 	
@@ -43,7 +43,7 @@ public class RootResource  {
 	}
 	
 	/**
-	 * Read this resource as a uf8 string
+	 * Read this resource as a utf-8 string
 	 * @return
 	 * @throws IOException
 	 */
@@ -53,6 +53,7 @@ public class RootResource  {
 	
 	/**
 	 * Read this resource as a string using the given encoding
+	 * 
 	 * @param encoding
 	 * 
 	 * @return
@@ -71,6 +72,7 @@ public class RootResource  {
 	
 	/**
 	 * Return a stream to write to this resource
+	 * 
 	 * @return
 	 * @throws IOException
 	 */
@@ -81,9 +83,9 @@ public class RootResource  {
     /**
      * Return information about the full path of this resource
      * 
-     * The returned value does not have to represent a file or url path, it it merely informative for debug and errors messages
+     * <p>The returned value does not have to represent a file or url path, it is merely informative for debug and errors messages</p>
      * 
-     * Delegates to {@link Root#getFullPathInfo(String)}
+     * <p>Delegates to {@link Root#getFullPathInfo(String)}</p>
      *  
      * @return the full path info, not machine readable
      */

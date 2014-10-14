@@ -15,50 +15,52 @@
  */
 package org.codemucker.jfind;
 
-import java.lang.annotation.Annotation;
-import java.util.regex.Pattern;
-
-import org.codemucker.jfind.ClassFinder.Builder;
-import org.codemucker.jfind.ClassFinder.FinderErrorCallback;
-import org.codemucker.jfind.ClassFinder.FinderFilter;
-import org.codemucker.jfind.ClassFinder.FinderIgnoredCallback;
-import org.codemucker.jfind.ClassFinder.FinderMatchedCallback;
+import org.codemucker.jfind.JFind.Builder;
+import org.codemucker.jfind.JFind.ErrorCallback;
+import org.codemucker.jfind.JFind.Filter;
+import org.codemucker.jfind.JFind.IgnoredCallback;
+import org.codemucker.jfind.JFind.MatchedCallback;
 import org.codemucker.jmatch.Matcher;
-
 
 public class Criteria {
 	
 	private Roots.Builder rootsBuilder = Roots.with();
 	
-	private final IncludeExcludeMatcherBuilder<RootResource> resources = IncludeExcludeMatcherBuilder.builder();
-	private final IncludeExcludeMatcherBuilder<Class<?>> classes = IncludeExcludeMatcherBuilder.builder();
-	private final IncludeExcludeMatcherBuilder<String> classNames = IncludeExcludeMatcherBuilder.builder();
-	private final IncludeExcludeMatcherBuilder<String> resourceNames = IncludeExcludeMatcherBuilder.builder();
-	
-	private ClassFinder.Builder builder = ClassFinder.withBuilder();
+	private final IncludeExcludeMatcherBuilder<Root> rootMatcher = IncludeExcludeMatcherBuilder.builder();
+	private final IncludeExcludeMatcherBuilder<RootResource> resourceMatcher = IncludeExcludeMatcherBuilder.builder();
+    private final IncludeExcludeMatcherBuilder<Class<?>> classMatcher = IncludeExcludeMatcherBuilder.builder();
 
-	public ClassFinder build() {
-		Builder copy = builder.copyOf();
-		
-		FinderFilter filter = ClassFinderFilter.newBuilder()
-			.setClassMatcher(classes.build())
-			.setResourceMatcher(resources.build())
-			.setClassNameMatcher(classNames.build())
-			.setResourceNameMatcher(resourceNames.build())
+    private IgnoredCallback ignoredCallback;
+    private MatchedCallback matchedCallback; 
+    private ErrorCallback errorCallback;
+
+    private ClassLoader classLoader;
+    
+    public static Criteria with(){
+        return new Criteria();
+    }
+    
+	public JFind build() {
+
+		Filter filter = JFindFilter.with()
+		    .rootMatches(rootMatcher.build())
+		    .resourceMatches(resourceMatcher.build())
+            .classMatches(classMatcher.build())
+			//.classNameMatches(classNames.build())
+			//.setResourceNameMatcher(resourceNames.build())
 			.build();
-		copy.setFilter(filter);
-		copy.setSearchClassPaths(rootsBuilder.build());
 		
+		Builder builder = JFind.with()
+		    .roots(rootsBuilder.build())
+		    .filter(filter);
 		
-		return copy.build();
-	}
-	
-	//TODO:reinstate
-	public Criteria setConsoleLoggingCallback(){
-	//	ConsoleLoggingCallBack callback = new ConsoleLoggingCallBack();
-	//	setIgnoreCallback(callback);
-	//	setMatchCallback(callback);
-		return this;
+		//if any null default will be used
+		builder.matchedCallback(matchedCallback);
+		builder.ignoredCallback(ignoredCallback);
+		builder.errorCallback(errorCallback);
+		builder.classLoader(classLoader);
+		
+	    return builder.build();
 	}
 
 	public Criteria root(Root root){
@@ -76,93 +78,43 @@ public class Criteria {
         return this;
     }
     
-	public Criteria ignoreCallback(FinderIgnoredCallback callback){
-		builder.setIgnoredCallback(callback);
+	public Criteria ignoreCallback(IgnoredCallback callback){
+		this.ignoredCallback = callback;
 		return this;
 	}
 	
-	public Criteria matchCallback(FinderMatchedCallback callback){
-		builder.setMatchedCallback(callback);
-		return this;
+	public Criteria matchCallback(MatchedCallback callback){
+	    this.matchedCallback = callback;
+	    return this;
 	}
 	
-	public Criteria errorCallback(FinderErrorCallback callback){
-		builder.setErrorCallback(callback);
+	public Criteria errorCallback(ErrorCallback callback){
+		this.errorCallback = callback;
 		return this;
 	}
 
 	public Criteria classLoader(ClassLoader classLoader) {
-    	builder.setClassLoader(classLoader);
+    	this.classLoader = classLoader;
     	return this;
     }
 
-	public Criteria excludeFileName(String path) {
-		excludeResource(AResource.with().pathMatchingAntPattern(path));
-		return this;
-	}
-	
-	public Criteria excludeFileName(Pattern pattern) {
-		excludeResource(AResource.with().pathMatchingRegex(pattern));
-		return this;
-	}
-
 	public Criteria excludeResource(Matcher<RootResource> matcher) {
-		resources.addExclude(matcher);
+		resourceMatcher.addExclude(matcher);
 		return this;
 	}
 
-	public Criteria includeFileName(String pattern) {
-		includeResource(AResource.with().pathMatchingAntPattern(pattern));
-		return this;
-	}
-
-	public Criteria includeFileName(Pattern pattern) {
-		includeResource(AResource.with().pathMatchingRegex(pattern));
-		return this;
-	}
-	
 	public Criteria includeResource(Matcher<RootResource> matcher) {
-		resources.addInclude(matcher);
+		resourceMatcher.addInclude(matcher);
 		return this;
 	}
-	
-	public Criteria assignableTo(Class<?>... superclass) {
-		includeClass(AClass.with().isASubclassOf(superclass));
-		return this;
-	}
-	
-	public <T extends Annotation> Criteria withAnnotation(Class<T>... annotations){
-		includeClass(AClass.with().annotation(annotations));
-		return this;
-	}
-	
+
 	public Criteria includeClass(Matcher<Class<?>> matcher) {
-		classes.addInclude(matcher);
-		return this;
-	}
-	
-	public Criteria excludeEnum() {
-		excludeClassMatching(AClass.with().isEnum());
+		classMatcher.addInclude(matcher);
 		return this;
 	}
 
-	public Criteria excludeAnonymous() {
-		excludeClassMatching(AClass.with().isAnonymous());
-		return this;
-	}
-
-	public Criteria excludeInner() {
-		excludeClassMatching(AClass.with().isInnerClass());
-		return this;
-	}
-
-	public Criteria excludeInterfaces() {
-		excludeClassMatching(AClass.with().isInterface());
-		return this;
-	}
-
-	public Criteria excludeClassMatching(Matcher<Class<?>> matcher) {
-		classes.addExclude(matcher);
+	public Criteria excludeClass(Matcher<Class<?>> matcher) {
+		classMatcher.addExclude(matcher);
 		return this;
 	}
 

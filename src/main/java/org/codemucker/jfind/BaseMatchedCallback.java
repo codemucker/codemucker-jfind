@@ -1,8 +1,8 @@
 package org.codemucker.jfind;
 
-import org.codemucker.jfind.ClassFinder.FinderMatchedCallback;
+import org.codemucker.jfind.JFind.MatchedCallback;
 
-public class BaseMatchedCallback implements FinderMatchedCallback {
+public class BaseMatchedCallback implements MatchedCallback {
 	@Override
 	public void onArchiveMatched(RootResource archiveFile) {
 	}
@@ -12,15 +12,15 @@ public class BaseMatchedCallback implements FinderMatchedCallback {
 	}
 
 	@Override
-	public void onClassNameMatched(String className) {
+	public void onClassNameMatched(RootResource resource,String className) {
 	}
 
 	@Override
-	public void onClassPathMatched(Root root) {
+	public void onRootMatched(Root root) {
 	}
 
 	@Override
-	public void onClassMatched(Class<?> matchedClass) {
+	public void onClassMatched(RootResource resource,Class<?> matchedClass) {
 	}
 
 	@Override
