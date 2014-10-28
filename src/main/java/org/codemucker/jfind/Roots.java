@@ -2,7 +2,6 @@ package org.codemucker.jfind;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.io.File;
 import java.io.IOException;
@@ -143,8 +142,11 @@ public final class Roots  {
                 }
                 classloader = classloader.getParent();
             }
+            //most classloaders defer to parent loaders first. Therefore parent loaders classpath entries should come first.
+            //as we walk up the chain we need to reverse the collected results
             Collections.reverse(urls);
 
+            //convert to file paths
             for (URL url : urls) {
                 try {
                     if ("file".equals(url.getProtocol())) {
@@ -227,12 +229,35 @@ public final class Roots  {
 	    	return this;
 	    }
 		
-		public Builder roots(Collection<File> paths, RootType relation, RootContentType contentType) {
-			for(File path:paths){
-				root(new DirectoryRoot(path,relation, contentType));
-			}
-	    	return this;
-	    }
+		public Builder rootsPaths(Collection<String> paths, RootType relation, RootContentType contentType) {
+            for (String path : paths) {
+                Root r = toRootOrNull(new File(path), relation, contentType);
+                if (r != null) {
+                    root(r);
+                }
+            }
+            return this;
+        }
+		
+        public Builder roots(Collection<File> paths, RootType relation, RootContentType contentType) {
+            for (File path : paths) {
+                Root r = toRootOrNull(path, relation, contentType);
+                if (r != null) {
+                    root(r);
+                }
+            }
+            return this;
+        }
+		
+        private static Root toRootOrNull(File f, RootType relation, RootContentType contentType) {
+            if (DirectoryRoot.is(f)) {
+                return new DirectoryRoot(f, relation, contentType);
+            }
+            if (ArchiveRoot.is(f)) {
+                return new ArchiveRoot(f, relation, contentType);
+            }
+            return null;
+        }
 		
 		public Builder root(File path) {
 			if( path.isFile()){
@@ -255,13 +280,13 @@ public final class Roots  {
 			return this;
 		}
 		
-		public Builder root(Root root) {
-			String key = root.getPathName();
-			if ((RootType.UNKNOWN != root.getType()) || !roots.containsKey(key)) {
-				roots.put(key, root);
-			}
-			return this;
-		}
+        public Builder root(Root root) {
+            String key = root.getPathName();
+            if ((RootType.UNKNOWN != root.getType()) || !roots.containsKey(key)) {
+                roots.put(key, root);
+            }
+            return this;
+        }
 		
 		public Builder allDirs() {
 			mainSrcDir(true);

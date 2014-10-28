@@ -42,7 +42,9 @@ public class DefaultFindResult<T> implements FindResult<T> {
 		List<T> list = newArrayList();
 		while( iter.hasNext()){
 			T ele = iter.next();
-			list.add(ele);
+			if( ele != null){
+			    list.add(ele);
+			}
 		}
 		return list;
 	}

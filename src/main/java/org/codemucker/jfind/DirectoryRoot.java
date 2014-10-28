@@ -10,6 +10,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.codemucker.lang.IBuilder;
 
 import com.google.common.base.Objects;
 
@@ -38,15 +42,23 @@ public class DirectoryRoot implements Root {
 	private final RootType type;
 	private final RootContentType contentType;
 	
+	public static Builder with(){
+	    return new Builder();
+	}
+	
+	public static boolean is(File f){
+	    return f.isDirectory();
+	}
+	
 	public DirectoryRoot(File path){
 		this(path,RootType.UNKNOWN,RootContentType.BINARY);
 	}
 	
 	public DirectoryRoot(File path,RootType type,RootContentType contentType){
 		this.baseDir = checkNotNull(path,"expect path");
-		this.type = checkNotNull(type,"expect root relation");
-		this.contentType = checkNotNull(contentType,"expect root content type");
-		if( path.exists() && !path.isDirectory()){
+		this.type = checkNotNull(type,"expect type (e.g. MAIN,TEST,GENERATED...)");
+		this.contentType = checkNotNull(contentType,"expect content type (e.g. SRC,BINARY, MIXED...)");
+		if(path.exists() && !path.isDirectory()){
 			throw new IllegalArgumentException("expect path to be a directory, path=" + path.getAbsolutePath());
 		}
 	}
@@ -57,7 +69,7 @@ public class DirectoryRoot implements Root {
     }
 
 	@Override
-	public boolean canReadReource(String relPath) {
+	public boolean canReadResource(String relPath) {
 		if (baseDir.canRead()) {
 			File f = getByRelPath(relPath);
 			return f.exists() && f.canRead();
@@ -71,8 +83,12 @@ public class DirectoryRoot implements Root {
 			//TODO:check relPath is in the given directory, no escaping up!
 			File f = new File(baseDir.getAbsolutePath(),relPath);
 			if(!f.exists()){
-				f.getParentFile().mkdirs();
-				f.createNewFile();
+                if (!f.getParentFile().mkdirs()) {
+                    throw new IOException("Couldn't create parent directories for full resource path '" + f.getAbsolutePath() + "'");
+                }
+				if(!f.createNewFile()){
+				    throw new IOException("Couldn't create resource file'" + f.getAbsolutePath() + "'");
+				}
 			}
 			if(!f.canWrite()){
 				throw new IOException(String.format("Don't have permission to write file '%s' in dir '%s' for root %s. Full path %s",relPath,baseDir.getAbsolutePath(),this, f.getAbsolutePath()));
@@ -103,13 +119,47 @@ public class DirectoryRoot implements Root {
 		}
 	}
 	
-	private File getByRelPath(String relpath){
+	@Override
+    public String getFullPathInfo(String relPath){
+        return getByRelPath(relPath).getAbsolutePath();
+    }
+	
+    @Override
+    public RootResource getResource(String relPath) {
+        validatePath(relPath);
+        return new RootResource(this, relPath);
+    }
+    
+	@Override
+    public URL getUrl(String relPath){
+        try {
+            return getByRelPath(relPath).toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new JFindException("couldn't convert relative path '" + relPath + "' to url", e);
+        }
+    }
+
+    @Override
+    public long getLastModified(String relPath) {
+        long ts = getByRelPath(relPath).lastModified();
+        if (ts <= 0L) {
+            ts = Root.TIMESTAMP_NOT_EXIST;
+        }
+        return ts;
+    }
+    
+    private File getByRelPath(String relpath){
+        validatePath(relpath);
 		return new File(baseDir.getAbsolutePath(),relpath);
 	}
 	
 	@Override
-	public String getFullPathInfo(String relPath){
-	    return new File(baseDir.getAbsolutePath(),relPath).getAbsolutePath();
+	public URL toURL(){
+	    try {
+            return baseDir.toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new JFindException("couldn't convert root directory path '" + baseDir + "' to url", e);
+        } 
 	}
 
     @Override
@@ -213,6 +263,19 @@ public class DirectoryRoot implements Root {
 		return Thread.interrupted();
 	}
 
+    private void validatePath(String relPath) {
+        if (relPath == null) {
+            throw new IllegalArgumentException("Invalid relative path. Expected not null");
+        }
+        char c;
+        for (int i = 0; i < relPath.length(); i++) {
+            c = relPath.charAt(i);
+            if (c == '|' || c == ';' || (c == '.' && i + 1 < relPath.length() && relPath.charAt(i + 1) == '.')) {
+                throw new IllegalArgumentException("Invalid relative path '" + relPath + "'");
+            }
+        }
+    }
+
     @Override
     public boolean isArchive() {
         return false;
@@ -222,4 +285,38 @@ public class DirectoryRoot implements Root {
     public boolean isDirectory() {
         return true;
     }
+    
+    public static class Builder implements IBuilder<DirectoryRoot> {
+
+        private File baseDir;
+        private RootType type;
+        private RootContentType contentType;
+
+        @Override
+        public DirectoryRoot build() {
+            return new DirectoryRoot(baseDir,type,contentType);
+        }
+
+        public Builder baseDir(File baseDir) {
+            this.baseDir = baseDir;
+            return this;
+        }
+
+        public Builder type(RootType type) {
+            this.type = type;
+            return this;
+        }
+
+        public Builder contentSrc() {
+            contentType(RootContentType.SRC);
+            return this;
+        }
+        
+        public Builder contentType(RootContentType contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+    }
+
 }

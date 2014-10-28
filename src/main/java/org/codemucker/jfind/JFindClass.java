@@ -19,29 +19,56 @@ public class JFindClass extends AbstractAccessibleObject {
     }
 
     public JFindClass(Class<?> type) {
-        super(type.getAnnotations(),type.getModifiers());
+        super(type.getAnnotations(), type.getModifiers());
         this.type = type;
     }
 
-    public Class<?> getUnderlying(){
+    public Class<?> getUnderlying() {
         return type;
     }
-    
+
     public boolean hasMethodMatching(Matcher<Method> matcher) {
-        for (Method m : type.getDeclaredMethods()) {
-            if (matcher.matches(m)) {
-                return true;
+        Class<?> t = type;
+        List<String> visitedMethods = new ArrayList<>();// ignore overridden
+                                                        // methods
+        while (t != null && t != Object.class) {
+            for (Method m : t.getDeclaredMethods()) {
+                if (m.isBridge()) {
+                    continue;
+                }
+                String sig = m.toGenericString();
+                if (!visitedMethods.contains(sig)) {
+                    if (matcher.matches(m)) {
+                        return true;
+                    }
+                    ;
+                    visitedMethods.add(sig);
+                }
             }
+            t = t.getSuperclass();
         }
         return false;
     }
 
     public FindResult<Method> findMethodsMatching(Matcher<Method> matcher) {
         List<Method> found = new ArrayList<>();
-        for (Method m : type.getDeclaredMethods()) {
-            if (matcher.matches(m)) {
-                found.add(m);
+        Class<?> t = type;
+        List<String> visitedMethods = new ArrayList<>();
+        while (t != null && t != Object.class) {
+            for (Method m : t.getDeclaredMethods()) {
+                if (m.isBridge()) {
+                    continue;
+                }
+                String sig = m.toGenericString();
+                if (!visitedMethods.contains(sig)) {
+                    visitedMethods.add(sig);
+                    if (matcher.matches(m)) {
+                        found.add(m);
+                    }
+                    ;
+                }
             }
+            t = t.getSuperclass();
         }
         return DefaultFindResult.from(found);
     }

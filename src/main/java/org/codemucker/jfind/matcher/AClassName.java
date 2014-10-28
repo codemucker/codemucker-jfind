@@ -27,32 +27,32 @@ public class AClassName extends ObjectMatcher<String> {
 
     public AClassName packageName(String packageName) {
 		String regExp = packageName.replaceAll("\\.", "\\.") + "\\.[^.]*";
-		nameRegexMatch(regExp);
+		regex(regExp);
 		return this;
     }
     
     public AClassName packageStartingWith(String packageName) {
 		String regExp = packageName.replaceAll("\\.", "\\.") + "\\..*";
-		nameRegexMatch(regExp);
+		regex(regExp);
 		return this;
 	}
     
-    public AClassName nameAntPatternMatch(final String nameAntPattern){
+    public AClassName antPattern(final String nameAntPattern){
     	addMatcher(AString.matchingAntPattern(nameAntPattern));
     	return this;
     }
 
-    public AClassName nameRegexMatch(final String namePattern){
+    public AClassName regex(final String namePattern){
     	addMatcher(AString.matchingRegex(namePattern));
     	return this;
     }
 
-    public AClassName nameRegexMatch(Pattern pattern){
+    public AClassName regex(Pattern pattern){
     	addMatcher(AString.matchingRegex(pattern));
     	return this;
     }
     
-    public AClassName name(final String name){
+    public AClassName equalTo(final String name){
     	addMatcher(AString.equalTo(name));
     	return this;
     }

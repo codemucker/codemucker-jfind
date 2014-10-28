@@ -1,7 +1,11 @@
 package org.codemucker.jfind.matcher;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
+import org.codemucker.jfind.JFindClass;
+import org.codemucker.jmatch.AString;
 import org.codemucker.jmatch.AbstractNotNullMatcher;
 import org.codemucker.jmatch.Description;
 import org.codemucker.jmatch.Logical;
@@ -92,6 +96,16 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
     public static Matcher<Class<?>> noClass() {
     	return Logical.none();
     }
+    
+    public AClass name(String fullName){
+        name(AString.matchingAntPattern(fullName));
+        return this;
+    }
+    
+    public AClass name(Matcher<String> matcher){
+        addMatchProperty("name", String.class, matcher);
+        return this;
+    }
 
     /**
      * Expect a class to be a sub class, implementation of, or equal to the given superclass
@@ -119,21 +133,58 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 	}
 	
     public AClass annotation(Class<? extends Annotation> annotation){
-        addMatcher(new ContainsAnnotationsMatcher(annotation));
+        annotation(AnAnnotation.with().fullName(annotation));
+        return this;
+    }
+	
+    public AClass annotation(final Matcher<Annotation> matcher) {
+        addMatcher(new AbstractNotNullMatcher<Class<?>>() {
+
+            @Override
+            protected boolean matchesSafely(Class<?> actual, MatchDiagnostics diag) {
+                return JFindClass.from(actual).hasAnnotation(matcher);
+            }
+
+            @Override
+            public void describeTo(Description desc) {
+                desc.value("with annotation", matcher);
+            }
+        });
         return this;
     }
     
-	/**
-	 * Class must be marked with the given annotation
-	 * @param annotations
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public AClass annotation(Class<? extends Annotation>... annotations){
-		addMatcher(new ContainsAnnotationsMatcher(annotations));
-		return this;
-	}
-	
+    public AClass field(final Matcher<Field> matcher) {
+        addMatcher(new AbstractNotNullMatcher<Class<?>>() {
+
+            @Override
+            protected boolean matchesSafely(Class<?> actual, MatchDiagnostics diag) {                
+                return JFindClass.from(actual).hasFieldsMatching(matcher);
+            }
+
+            @Override
+            public void describeTo(Description desc) {
+                desc.value("with field", matcher);
+            }
+        });
+        return this;
+    }
+    
+    public AClass method(final Matcher<Method> matcher) {
+        addMatcher(new AbstractNotNullMatcher<Class<?>>() {
+
+            @Override
+            protected boolean matchesSafely(Class<?> actual, MatchDiagnostics diag) {                
+                return JFindClass.from(actual).hasMethodMatching(matcher);
+            }
+
+            @Override
+            public void describeTo(Description desc) {
+                desc.value("with method", matcher);
+            }
+        });
+        return this;
+    }
+    
 	public AClass isPublicConcreteClass() {
 	    isNotAnonymous();
 	    isNotInterface();
@@ -181,28 +232,5 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 		return this;
 	}
 
-	private static class ContainsAnnotationsMatcher extends AbstractNotNullMatcher<Class<?>> {
-		private final Class<? extends Annotation>[] annotations;
 
-		@SafeVarargs
-		public ContainsAnnotationsMatcher(Class<? extends Annotation>... annotations) {
-	        this.annotations = annotations;
-	    }
-
-		@Override
-		@SuppressWarnings("rawtypes")
-		public boolean matchesSafely(Class found,MatchDiagnostics diag) {
-			for (Class<?> anon : annotations) {
-				if (found.getAnnotation(anon) == null) {
-					return false;
-				}
-			}
-			return true;
-		}
-		
-		@Override
-        public void describeTo(Description desc) {
-            desc.value("contains all annotations", annotations);
-        }
-	}
 }

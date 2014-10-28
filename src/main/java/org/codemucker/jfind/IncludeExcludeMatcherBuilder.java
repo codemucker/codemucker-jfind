@@ -8,10 +8,34 @@ import static org.codemucker.jmatch.Logical.not;
 import java.util.Collection;
 
 import org.codemucker.jmatch.Matcher;
+import org.codemucker.lang.IBuilder;
 
-public final class IncludeExcludeMatcherBuilder<T> {
+/**
+ * Builds a matcher using a list of include/exclude matchers.
+ * 
+ * <p>
+ * Rules are:
+ * 
+ * <ul>
+ * <li>If no includes or excludes, match everything</li>
+ * <li>anything matching an exclude is excluded</li>
+ * <li>if there are any includes, it must match at least one of the includes,
+ * and not match any excludes to be included</li>
+ * </ul>
+ * 
+ * </p>
+ * 
+ * @param <T>
+ */
+public final class IncludeExcludeMatcherBuilder<T> implements IBuilder<Matcher<T>> {
 
+    /**
+     * Exclude anything matching this
+     */
 	private final Collection<Matcher<T>> excludes = newArrayList();
+	/**
+	 * Anything matching this is included, if it's not excluded
+	 */
 	private final Collection<Matcher<T>> includes = newArrayList();
 	
 	public static <T> IncludeExcludeMatcherBuilder<T> builder() {

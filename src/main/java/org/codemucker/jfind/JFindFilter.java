@@ -9,6 +9,7 @@ public class JFindFilter implements Filter{
 	
 	private final Matcher<Root> rootMatcher;
 	private final Matcher<RootResource> resourceMatcher;
+	private final Matcher<String> packageNameMatcher;
 	private final Matcher<String> classNameMatcher;
 	private final Matcher<Class<?>> classMatcher;
 	
@@ -20,12 +21,14 @@ public class JFindFilter implements Filter{
 			Matcher<Root> classPathMatcher
 			, Matcher<RootResource> resourceMatcher
 			, Matcher<String> resourceNameMatcher
+			, Matcher<String> packageNameMatcher
 			, Matcher<String> classNameMatcher
 			, Matcher<Class<?>> classMatcher
 			){
 		this.rootMatcher = anyIfNull(classPathMatcher);
 		this.resourceMatcher = anyIfNull(resourceMatcher);
 		this.classNameMatcher = anyIfNull(classNameMatcher);
+		this.packageNameMatcher = anyIfNull(packageNameMatcher);
 		this.classMatcher = anyIfNull(classMatcher);
 	}
 	
@@ -50,7 +53,15 @@ public class JFindFilter implements Filter{
 	
 	@Override
 	public boolean isIncludeClassname(RootResource resource,String className) {
-		return classNameMatcher.matches(className);
+	    return packageNameMatcher.matches(extractPackageName(className)) && classNameMatcher.matches(className);
+	}
+	
+	private static String extractPackageName(String className){
+	    int lastdot = className.lastIndexOf('.');
+	    if(lastdot !=-1){
+	        return className.substring(0,lastdot);
+	    }
+	    return "";
 	}
 	
 	@Override
@@ -72,7 +83,7 @@ public class JFindFilter implements Filter{
 	    
 		private Matcher<Root> rootMatcher;
 		private Matcher<RootResource> resourceMatcher;
-		//private Matcher<String> resourceNameMatcher;
+		private Matcher<String> packageNameMatcher;
 		private Matcher<String> classNameMatcher;
 		private Matcher<Class<?>> classMatcher;
 		
@@ -81,6 +92,7 @@ public class JFindFilter implements Filter{
 				rootMatcher
 				, resourceMatcher
 				, null//resourceNameMatcher
+				, packageNameMatcher
 				, classNameMatcher
 				, classMatcher
 			);
@@ -94,6 +106,11 @@ public class JFindFilter implements Filter{
 		public Builder rootMatches(Matcher<Root> matcher) {
         	this.rootMatcher = matcher;
         	return this;
+        }
+		
+		public Builder packageNameMatches(Matcher<String> packageNameMatcher) {
+            this.packageNameMatcher = packageNameMatcher;
+            return this;
         }
 		
 		public Builder classNameMatches(Matcher<String> classNameMatcher) {

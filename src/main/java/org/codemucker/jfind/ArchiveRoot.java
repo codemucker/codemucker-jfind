@@ -3,16 +3,20 @@ package org.codemucker.jfind;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Enumeration;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
+import org.apache.commons.io.IOUtils;
 
 import com.google.common.base.Objects;
 
@@ -20,17 +24,28 @@ import com.google.common.base.Objects;
  * Classpath root which handles archive (zip) files
  */
 public class ArchiveRoot implements Root {
-	private final File path;
+	private final File archivePath;
 	private final RootType type;
 	private final RootContentType contentType;
-	private final AtomicReference<ZipFile> cachedZip = new AtomicReference<ZipFile>();
+	private final AtomicReference<ZipWrapper> cachedZip = new AtomicReference<ZipWrapper>();
+	private static final String[] EXTENSIONS = new String[]{ ".jar",".zip"};
 	
+	public static boolean is(File f){
+	    if(f.isFile()){
+	        for(String ext:EXTENSIONS){
+	            if(f.getPath().endsWith(ext)){
+	                return true;
+	            }
+	        }
+	    }
+        return false;
+    }
 	public ArchiveRoot(File path){
 		this(path,RootType.UNKNOWN,RootContentType.BINARY);
 	}
 	
 	public ArchiveRoot(File path,RootType type,RootContentType contentType){
-		this.path = checkNotNull(path,"expect path");
+		this.archivePath = checkNotNull(path,"expect path");
 		this.type = checkNotNull(type,"expect root relation");
 		this.contentType = checkNotNull(contentType,"expect root content type");
 		checkState(path.isFile(),"expect archive file to be a file");
@@ -42,14 +57,50 @@ public class ArchiveRoot implements Root {
     }
 
 	@Override
-    public boolean canReadReource(String relPath) {
-	    return path.exists() && path.canRead() && getZip().getEntry(relPath) != null;
+    public boolean canReadResource(String relPath) {
+	    return archivePath.exists() && archivePath.canRead() && getZip().hasEntry(relPath);
     }
 	
 
     @Override
     public String getFullPathInfo(String relPath) {
-        return path.getAbsolutePath() + "!" + relPath;
+        return archivePath.getAbsolutePath() + "!" + relPath;
+    }
+    
+    @Override
+    public RootResource getResource(String relPath){   
+        return new RootResource(this, relPath);
+    }
+    
+    @Override
+    public URL getUrl(String relPath){
+        try {
+            return new URL(archivePath.toURI().toURL().toExternalForm() + "!"  + relPath);
+        } catch (MalformedURLException e) {
+            throw new JFindException("couldn't convert relative path '" + relPath + "' to url", e);
+        }
+    }
+    
+    @Override
+    public long getLastModified(String relPath) {
+        ZipWrapper zip = getZip();
+        long ts = zip.getEntry(relPath).getTime();
+        if (ts < 0) {
+            ts = zip.latModified();
+        }
+        if (ts <= 0L) {
+            ts = Root.TIMESTAMP_NOT_EXIST;
+        }
+        return ts;
+    }
+    
+    @Override
+    public URL toURL(){
+        try {
+            return archivePath.toURI().toURL();
+        } catch (MalformedURLException e) {
+            throw new JFindException("couldn't convert archive path '" + archivePath + "' to url", e);
+        }
     }
     
 	@Override
@@ -59,38 +110,12 @@ public class ArchiveRoot implements Root {
 	
 	@Override
 	public InputStream getResourceInputStream(String relPath) throws IOException {
-		if(!path.exists()){
-			throw new FileNotFoundException(String.format("Couldn't find archive '%s' for root %s",path.getAbsolutePath(),this));	
-		}
-		if(!path.canRead()){
-			throw new FileNotFoundException(String.format("Couldn't read archive entry '%s' in archive '%s' as archive is not readable for root %s",relPath,path.getAbsolutePath(),this));	
-		}
-		ZipFile zip = getZip();
-		ZipEntry entry = zip.getEntry(relPath);
-		if( entry == null){
-			throw new FileNotFoundException(String.format("Couldn't find archive entry '%s' in archive '%s' for root %s",relPath,path.getAbsolutePath(),this));
-		}
-		return zip.getInputStream(entry);
-	}
-
-	private ZipFile getZip(){
-		ZipFile zip = cachedZip.get();
-		if (zip == null) {
-			try {
-				zip = new ZipFile(path);
-				cachedZip.set(zip);
-			} catch (ZipException e) {
-				throw new JFindException("Error opening archive file:" + path.getAbsolutePath(), e);
-			} catch (IOException e) {
-				throw new JFindException("Error opening archive file:" + path.getAbsolutePath(), e);
-			}
-		}
-		return zip;
+		return getZip().getEntryInputStream(relPath);
 	}
 	
 	@Override
 	public String getPathName(){
-		return PathUtil.toForwardSlashes(path.getAbsolutePath());
+		return PathUtil.toForwardSlashes(archivePath.getAbsolutePath());
 	}
 
 	@Override
@@ -111,7 +136,7 @@ public class ArchiveRoot implements Root {
     		.add("type", type)
     		.add("contentType", contentType)
     		.add("isArchive", true)
-    		.add("exists", path.canRead())
+    		.add("exists", archivePath.canRead())
      		.toString();
     }
 	
@@ -124,36 +149,24 @@ public class ArchiveRoot implements Root {
 	}
 
 	private void visitResources(RootVisitor visitor) {
-		ZipFile zip = getZip();
+		ZipWrapper zip = getZip();
 		try {
-			internalWalkZipEntries(this, visitor, zip);
+			zip.visitZipEntries(visitor);
 		} finally {
-			try {
-	            zip.close();
-            } catch (IOException e) {
-            	//ignore
-            }
-			cachedZip.set(null);
+		    cachedZip.set(null);
+		    IOUtils.closeQuietly(zip);
 		}
 	}
 	
-	private static void internalWalkZipEntries(Root root, RootVisitor visitor, ZipFile zip){
-		Enumeration<? extends ZipEntry> entries = zip.entries();
-		while(entries.hasMoreElements()){
-			ZipEntry entry = entries.nextElement();
-			if( !entry.isDirectory()){
-				String name = entry.getName();
-				name = ensureStartsWithSlash(name);
-				RootResource zipResourceEntry = new RootResource(root, name);
-				visitor.visit(zipResourceEntry);
-				visitor.endVisit(zipResourceEntry);
-				if (isCancelled()) {
-					return;
-				}
-			}
-		}
-	}
-	
+   private ZipWrapper getZip() {       
+        ZipWrapper wrapper = cachedZip.get();
+        if (wrapper == null) {
+            wrapper = new ZipWrapper(this, archivePath);
+            cachedZip.set(wrapper);
+        }
+        return wrapper;
+    }
+
 	private static boolean isCancelled(){
 		return Thread.interrupted();
 	}
@@ -171,7 +184,7 @@ public class ArchiveRoot implements Root {
 		int result = 1;
 		result = prime * result
 				+ ((contentType == null) ? 0 : contentType.hashCode());
-		result = prime * result + ((path == null) ? 0 : path.hashCode());
+		result = prime * result + ((archivePath == null) ? 0 : archivePath.hashCode());
 		result = prime * result
 				+ ((type == null) ? 0 : type.hashCode());
 		return result;
@@ -188,10 +201,10 @@ public class ArchiveRoot implements Root {
 		ArchiveRoot other = (ArchiveRoot) obj;
 		if (contentType != other.contentType)
 			return false;
-		if (path == null) {
-			if (other.path != null)
+		if (archivePath == null) {
+			if (other.archivePath != null)
 				return false;
-		} else if (!path.equals(other.path))
+		} else if (!archivePath.equals(other.archivePath))
 			return false;
 		if (type != other.type)
 			return false;
@@ -206,6 +219,81 @@ public class ArchiveRoot implements Root {
     @Override
     public boolean isDirectory() {
         return false;
+    }
+    
+    private static class ZipWrapper implements Closeable {
+        private final ZipFile zip;
+        private final File archivePath;
+        private final ArchiveRoot root;
+        
+        ZipWrapper(ArchiveRoot root, File archivePath) {
+            if (!archivePath.exists()) {
+                throw new JFindException(String.format("Couldn't find archive %s", root));
+            }
+            if (!archivePath.canRead()) {
+                throw new JFindException(String.format("Couldn't read archive %s as is not readable", root));
+            }
+            this.archivePath = archivePath;
+            this.root = root;
+            try {
+                zip = new ZipFile(archivePath);
+            } catch (ZipException e) {
+                throw new JFindException("Error opening archive " + root, e);
+            } catch (IOException e) {
+                throw new JFindException("Error opening archive " + root, e);
+            }
+        }
+        
+        long latModified(){
+            return archivePath.lastModified();
+        }
+
+        InputStream getEntryInputStream(String relPath) throws IOException {
+            return zip.getInputStream(getEntry(relPath));
+        }
+
+        boolean hasEntry(String relPath) {
+            return zip.getEntry(relPath)!=null;
+        }
+        
+        ZipEntry getEntry(String relPath) {
+            relPath = toZipPath(relPath);
+            ZipEntry entry = zip.getEntry(relPath);
+            if (entry == null) {
+                throw new JFindException(String.format("Couldn't find archive entry '%s' in archive %s", relPath,root));
+            }
+            return entry;
+        }
+        
+        private static String toZipPath(String relPath){
+            relPath = relPath.replace('\\', '/');
+            if(relPath.startsWith("/")){
+                relPath = relPath.substring(1);
+            }
+            return relPath;
+        }
+
+        void visitZipEntries(RootVisitor visitor){
+            Enumeration<? extends ZipEntry> entries = zip.entries();
+            while(entries.hasMoreElements()){
+                ZipEntry entry = entries.nextElement();
+                if( !entry.isDirectory()){
+                    String name = entry.getName();
+                    name = ensureStartsWithSlash(name);
+                    RootResource zipResourceEntry = new RootResource(root, name);
+                    visitor.visit(zipResourceEntry);
+                    visitor.endVisit(zipResourceEntry);
+                    if (isCancelled()) {
+                        return;
+                    }
+                }
+            }
+        }
+        
+        @Override
+        public void close() throws IOException {
+            IOUtils.closeQuietly(zip);
+        }
     }
 
 }

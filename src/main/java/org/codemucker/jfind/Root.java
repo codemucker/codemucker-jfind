@@ -4,6 +4,7 @@ package org.codemucker.jfind;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 /**
  * Represents the top level node to resolve relative resource paths from. This could be 
@@ -29,6 +30,8 @@ public interface Root {
 	public static enum RootContentType {
     	SRC, BINARY, MIXED;
     }
+	
+	public static final long TIMESTAMP_NOT_EXIST = -1;
 
     /**
      * Return information about the full path of the given relative resource. 
@@ -39,6 +42,9 @@ public interface Root {
      * @return the full path info, not machine readable
      */
     String getFullPathInfo(String relPath);
+    URL getUrl(String relPath);
+    URL toURL();
+    long getLastModified(String relPath);
     
 	/**
 	 * Return a stream to read the given relative stream from
@@ -60,16 +66,24 @@ public interface Root {
 	OutputStream getResourceOutputStream(String relPath) throws IOException;
 
 	public boolean canWriteResource(String relPath);
-	public boolean canReadReource(String relPath);
+	
+	/**
+	 * Check if the given resource exists and is readable
+	 * @param relPath
+	 * @return
+	 */
+	public boolean canReadResource(String relPath);
 	
 	String getPathName();
 
 	RootType getType();
 	RootContentType getContentType();
-
+	RootResource getResource(String relPath);
+    
 	void accept(RootVisitor visitor);
 
 	public boolean isArchive();
 	public boolean isDirectory();
+	
     
 }

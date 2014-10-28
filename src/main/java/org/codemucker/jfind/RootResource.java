@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -15,7 +16,7 @@ public class RootResource  {
 
 	private final Root root;
 	private final String relPath;
-	private final int depth;
+    private final int depth;
 
 	public RootResource(Root root, String relPath) {
 		this.root = checkNotNull(root,"expect class path root");
@@ -93,10 +94,18 @@ public class RootResource  {
         return getRoot().getFullPathInfo(relPath);
     }
     
+	public URL toURL() {
+        return getRoot().getUrl(relPath);
+    }
+	
 	public Root getRoot() {
 		return root;
 	}
 
+	public long getLastModified(){
+	    return root.getLastModified(relPath);
+	}
+	
 	public int getDepthFromRoot() {
     	return depth;
     }
@@ -129,6 +138,10 @@ public class RootResource  {
 		return relPath;
 	}
 	
+	public boolean exists(){
+	    return root.canReadResource(relPath);
+	}
+	
 	public boolean hasExtension(String extension){
 		return extension.equals(getExtension());
 	}
@@ -149,7 +162,7 @@ public class RootResource  {
 	public String toString(){
 		return Objects
 			.toStringHelper(this)
-			.add("classPathRoot", root)
+			.add("root", root)
 			.add("relPath", relPath)
 			.add("depth",depth)
 			.add("extension",getExtension())
