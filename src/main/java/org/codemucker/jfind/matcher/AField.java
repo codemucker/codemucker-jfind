@@ -2,13 +2,8 @@ package org.codemucker.jfind.matcher;
 
 import java.lang.reflect.Field;
 
-import org.codemucker.jfind.JavaModifier;
 import org.codemucker.jmatch.AString;
-import org.codemucker.jmatch.AbstractNotNullMatcher;
-import org.codemucker.jmatch.Description;
-import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
-import org.codemucker.jmatch.PropertyMatcher;
 
 public class AField extends AbstractModiferMatcher<AField,Field>{
 

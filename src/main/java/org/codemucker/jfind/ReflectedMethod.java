@@ -2,18 +2,18 @@ package org.codemucker.jfind;
 
 import java.lang.reflect.Method;
 
-public class JFindMethod extends AbstractAccessibleObject {
+public class ReflectedMethod extends AbstractReflectedObject {
 
     private final Method method;
 
-    public static JFindMethod from(Method method) {
+    public static ReflectedMethod from(Method method) {
         if(method==null){
             return null;
         }
-        return new JFindMethod(method);
+        return new ReflectedMethod(method);
     }
 
-    public JFindMethod(Method method) {
+    public ReflectedMethod(Method method) {
         super(method.getAnnotations(),method.getModifiers());
         this.method = method;
     }

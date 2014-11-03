@@ -1,7 +1,7 @@
 package org.codemucker.jfind;
 
 import org.codemucker.jfind.matcher.ARootResource;
-import org.codemucker.jtest.ProjectFinder;
+import org.codemucker.jtest.ProjectLayouts;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -30,6 +30,6 @@ public class ARootResourceTest {
 
 
 	private static DirectoryRoot newTmpRoot() {
-		return new DirectoryRoot(ProjectFinder.getDefaultResolver().getTmpDir());
+		return new DirectoryRoot(ProjectLayouts.getDefaultResolver().getTmpDir());
 	}
 }

@@ -12,6 +12,7 @@ import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
 import org.codemucker.jmatch.PropertyMatcher;
+import org.codemucker.lang.PathUtil;
 
 import com.google.common.base.Preconditions;
 
@@ -29,10 +30,29 @@ public class AResource extends PropertyMatcher<RootResource> {
     	return Logical.any();
     }
     
+    @SafeVarargs
+    public static Matcher<RootResource> any(Matcher<RootResource>... matchers) {
+        return Logical.any(matchers);
+    }
+    
     public static Matcher<RootResource> none() {
     	return Logical.none();
     }
     
+    public static Matcher<RootResource> not(Matcher<RootResource> matcher) {
+        return Logical.not(matcher);
+    }
+    
+    public AResource packageName(Class<?> classWithPkg) {
+        packageName(classWithPkg.getPackage());
+        return this;
+    }
+
+    public AResource packageName(Package pkg) {
+        packageName(pkg.getName());
+        return this;
+    }
+
     public AResource packageName(String packageName) {
         packageName(AString.equalTo(packageName));
         return this;
@@ -43,33 +63,23 @@ public class AResource extends PropertyMatcher<RootResource> {
 		return this;
 	}
 
+	public AResource className(Class<?> classToMatch) {
+        className(AString.equalTo(classToMatch.getName()));
+        return this;
+    }
+    
+    public AResource className(Matcher<String> classNameMatcher) {
+        addMatcher(new ResourceClassNameMatcher(classNameMatcher));
+        return this;
+    }
+    
 	public AResource extension(String extension) {
 		pathMatchingAntPattern("**." + extension);
 		return this;
 	}
 
-	public AResource fullName(Class<?> classToMatch) {
-		String path = '/' + classToMatch.getSimpleName() + "\\.java";
-		Package pkg = classToMatch.getPackage();
-		if (pkg != null) {
-			path = '/' + pkg.getName().replace('.', '/') + path;
-		}
-		pathMatchingRegex(Pattern.compile(path));
-		return this;
-	}
-	
 	public AResource nameMatchingAntPattern(String antPattern) {
 		pathMatchingAntPattern("**/" + antPattern);
-		return this;
-	}
-
-	public AResource packageName(Class<?> classWithPkg) {
-		packageName(classWithPkg.getPackage());
-		return this;
-	}
-
-	public AResource packageName(Package pkg) {
-		pathMatchingAntPattern(pkg.toString().replace('.', '/'));
 		return this;
 	}
 
@@ -120,13 +130,11 @@ public class AResource extends PropertyMatcher<RootResource> {
 		
 		@Override
 		public void describeTo(Description desc) {
-			//super.describeTo(desc);
-			//desc.text("not null resouce");
 			desc.value("relative path", pathMatcher);
 		}
 	}
-	
-	/**
+
+	   /**
      * Use a named class so in debug mode the diagnostics debug messages print out a better matcher type message
      */
     private static class ResourcePackageNameMatcher extends AbstractMatcher<RootResource>{
@@ -143,19 +151,43 @@ public class AResource extends PropertyMatcher<RootResource> {
         }
         
         private static String pathToPkgName(String relPath){
-            String className = FilenameUtils.removeExtension(relPath);
-            className = FilenameUtils.separatorsToUnix(className);
-            className = className.replace('/', '.');
-            int dot = className.lastIndexOf('.');
+            //we don't care if the file is an actual class or source file, just interested in the package path part
+            String name = FilenameUtils.removeExtension(relPath);
+            name = PathUtil.toForwardSlashes(name);
+            name = name.replace('/', '.');
+            int dot = name.lastIndexOf('.');
             if( dot !=-1){
-                return className.substring(0,dot);
+                return name.substring(0,dot);
             }
-            return className;
+            return name;
         }
         
         @Override
         public void describeTo(Description desc) {
             desc.value("package name", pkgMatcher);
+        }
+    }
+
+    
+	/**
+     * Use a named class so in debug mode the diagnostics debug messages print out a better matcher type message
+     */
+    private static class ResourceClassNameMatcher extends AbstractMatcher<RootResource>{
+        private final Matcher<String> classNameMatcher;
+
+        ResourceClassNameMatcher(Matcher<String> classNameMatcher){
+            this.classNameMatcher = Preconditions.checkNotNull(classNameMatcher,"null class name matcher");
+        }
+
+        @Override
+        public boolean matchesSafely(RootResource actual,MatchDiagnostics diag) {
+            String fullClassName = PathUtil.filePathToClassNameOrNull(actual.getRelPath());
+            return fullClassName != null && diag.tryMatch(this,fullClassName, classNameMatcher);
+        }
+        
+        @Override
+        public void describeTo(Description desc) {
+            desc.value("class name", classNameMatcher);
         }
     }
 

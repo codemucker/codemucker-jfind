@@ -16,8 +16,8 @@ import java.util.Set;
 
 import org.codemucker.jfind.Root.RootContentType;
 import org.codemucker.jfind.Root.RootType;
-import org.codemucker.jtest.ProjectFinder;
-import org.codemucker.jtest.ProjectResolver;
+import org.codemucker.jtest.ProjectLayout;
+import org.codemucker.jtest.ProjectLayouts;
 import org.codemucker.lang.IBuilder;
 
 import com.google.common.collect.Sets;
@@ -38,13 +38,13 @@ public final class Roots  {
 		private final Map<String,Root> roots = newLinkedHashMap();
 		
 		//TODO:support multiple projects?
-		private ProjectResolver projectResolver;
+		private ProjectLayout projectLayout;
 		
 		//TODO: set all to false to force explicit include
-
 		private boolean includeMainSrcDir = true;
-		private boolean includeTestSrcDir = false;
 		private boolean includeGeneratedSrcDir = false;
+        private boolean includeTestSrcDir = false;
+		private boolean includeTestGeneratedSrcDir = false;
 		private boolean includeClasspath = false;
 		
 		private Set<String> archiveTypes = Sets.newHashSet("jar","zip","ear","war");
@@ -64,8 +64,9 @@ public final class Roots  {
 		 * Return a mutable list of class path roots. CHanges in the builder are not reflected in the returned
 		 * list (or vice versa)
 		 */
-		public List<Root> build(){
-			ProjectResolver resolver = toResolver();
+		@Override
+        public List<Root> build(){
+			ProjectLayout resolver = toResolver();
 			
 			Builder copy = new Builder();
 			copy.roots.putAll(roots);
@@ -73,31 +74,36 @@ public final class Roots  {
 				copy.roots(resolver.getMainSrcDirs(),RootType.MAIN, RootContentType.SRC);
 			}
 			if (includeTestSrcDir) {
-				copy.roots(resolver.getTestSrcDirs(),RootType.MAIN, RootContentType.SRC);
+				copy.roots(resolver.getTestSrcDirs(),RootType.TEST, RootContentType.SRC);
 			}
 			if (includeGeneratedSrcDir) {
 				copy.roots(resolver.getGeneratedSrcDirs(),RootType.MAIN, RootContentType.SRC);
 			}
+			
 			if (includeMainCompiledDir) {
 				copy.roots(resolver.getMainCompileTargetDirs(),RootType.MAIN, RootContentType.BINARY);
 			}
 			if (includeTestCompiledDir) {
 				copy.roots(resolver.getTestCompileTargetDirs(),RootType.TEST, RootContentType.BINARY);
 			}
-			
+			if (includeTestGeneratedSrcDir) {
+                copy.roots(resolver.getTestGeneratedSrcDirs(),RootType.TEST, RootContentType.SRC);
+            }
+            
 			if (includeClasspath) {
 				copy.roots(findClassPathDirs());
 			}
+			
 			return newArrayList(copy.roots.values());
 		}
 		
-		private ProjectResolver toResolver(){
-			return projectResolver != null ? projectResolver : ProjectFinder.getDefaultResolver();
+		private ProjectLayout toResolver(){
+			return projectLayout != null ? projectLayout : ProjectLayouts.getDefaultResolver();
 		}
 		
 		public Builder copyOf() {
 			Builder copy = new Builder();
-			copy.projectResolver = projectResolver;
+			copy.projectLayout = projectLayout;
 			copy.includeMainSrcDir = includeMainSrcDir;
 			copy.includeClasspath = includeClasspath;
 			copy.includeGeneratedSrcDir = includeGeneratedSrcDir;
@@ -121,19 +127,17 @@ public final class Roots  {
 		 */
 		private Collection<File> findClassPathDirs() {
 		    Map<String,File> files = newLinkedHashMap();
-		    findClassPathDirsFromClassLoaders(files);
+		    findClassPathDirsFromClassLoaders(Thread.currentThread().getContextClassLoader(),files);
 		    findClassPathDirsFromSystemProperty(files);
 		    return files.values();
 		}
 
-        private void findClassPathDirsFromClassLoaders(Map<String, File> files) {
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        private void findClassPathDirsFromClassLoaders(ClassLoader classloader,Map<String, File> files) {
             List<URL> urls = new ArrayList<>();
 
             while (classloader != null) {
                 if (classloader instanceof URLClassLoader) {
-                    URLClassLoader ucl = (URLClassLoader) classloader;
-                    for (URL url : ucl.getURLs()) {
+                    for (URL url : ((URLClassLoader) classloader).getURLs()) {
                         urls.add(url);
                         // System.out.println("Roots:url=" + url.getPath());
                     }
@@ -193,8 +197,8 @@ public final class Roots  {
             }
         }
 
-		public Builder projectResolver(ProjectResolver resolver){
-			this.projectResolver = resolver;
+		public Builder projectLayout(ProjectLayout layout){
+			this.projectLayout = layout;
 			return this;
 		}
 		
@@ -216,7 +220,17 @@ public final class Roots  {
 			this.archiveTypes.add(extension);
 	    	return this;
 	    }
-		
+
+        public Builder urls(Iterable<URL> urls) {
+            for(URL url:urls){
+                if(url.getProtocol().equals("file")){
+                    root(new File(url.getPath()));
+                }
+            }
+            return this;
+        }
+        
+        
 		public Builder root(String path) {
 	    	root(new File(path));
 	    	return this;
@@ -273,6 +287,11 @@ public final class Roots  {
 			return this;
 	    }
 	
+		public Builder roots(IBuilder<? extends Iterable<Root>> builder) {
+            roots(builder.build());
+            return this;
+        }
+		
 		public Builder roots(Iterable<Root> roots) {
 			for(Root root:roots){
 				root(root);
@@ -280,28 +299,38 @@ public final class Roots  {
 			return this;
 		}
 		
+		public Builder root(IBuilder<Root> builder) {
+		    root(builder.build());
+		    return this;
+		}
+		
         public Builder root(Root root) {
-            String key = root.getPathName();
-            if ((RootType.UNKNOWN != root.getType()) || !roots.containsKey(key)) {
-                roots.put(key, root);
+            String path = root.getPathName();
+            if (!roots.containsKey(path) || (root.getType() != RootType.UNKNOWN)) { //always replace UNKNOWN with a  known type
+                roots.put(path, root);
             }
             return this;
         }
 		
-		public Builder allDirs() {
+		public Builder all() {
 			mainSrcDir(true);
 			testSrcDir(true);
+			
 			generatedSrcDir(true);
-			classpath(true);
+			testGeneratedSrcDir(true);
+
 			mainCompiledDir(true);
 			testCompiledDir(true);
+
+			classpath(true);
 			return this;
 		}
 
-		public Builder allSrcDirs() {
+		public Builder srcDirsOnly() {
 			mainSrcDir(true);
 			generatedSrcDir(true);
 			testSrcDir(true);
+			testGeneratedSrcDir(true);
 			classpath(false);
 			return this;
 		}
@@ -330,6 +359,13 @@ public final class Roots  {
 			this.includeTestCompiledDir = b;
 			return this;
 		}
+	
+		  public Builder testGeneratedSrcDir(boolean b) {
+	            this.includeTestGeneratedSrcDir = b;
+	            return this;
+	        }
+	    
+		  
 		public Builder classpath(boolean b) {
 	    	this.includeClasspath = b;
 	    	return this;

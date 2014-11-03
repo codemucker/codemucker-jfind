@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
+import org.codemucker.jmatch.NullMatchContext;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -96,12 +98,17 @@ public class DefaultFindResult<T> implements FindResult<T> {
 
 	@Override
 	public FindResult<T> filter(FindResult.Filter<T> filter) {
-		return filter(filter,filter);
+		return filter(filter,filter, NullMatchContext.INSTANCE);
 	}
 	
 	@Override
-    public FindResult<T> filter(Matcher<T> matcher, JFindMatchListener<? super T> listener) {
-		return from(FilteringIterator.from(source.iterator(), matcher, listener));
+    public FindResult<T> filter(Matcher<T> matcher,MatchListener<? super T> listener) {
+        return filter(matcher,listener, NullMatchContext.INSTANCE);
+    }
+    
+	@Override
+    public FindResult<T> filter(Matcher<T> matcher, MatchListener<? super T> listener, MatchDiagnostics diagnostics) {
+		return from(FilteringIterator.from(source.iterator(), matcher, listener, diagnostics==null?NullMatchContext.INSTANCE:diagnostics));
     }
 
 	@Override
@@ -142,21 +149,22 @@ public class DefaultFindResult<T> implements FindResult<T> {
 
 		private final Iterator<T> source;
 		private final Matcher<T> matcher;
-		private final JFindMatchListener<? super T> listener;
-		
+		private final MatchListener<? super T> listener;
+		private final MatchDiagnostics diagnostics;
+        
 		private T nextItem;
 		
 		private boolean init = true;
 
-		static <T> FilteringIterator<T> from(Iterator<T> source, Matcher<T> matcher, JFindMatchListener<? super T> listener){
-			return new FilteringIterator<T>(source,matcher, listener);
+		static <T> FilteringIterator<T> from(Iterator<T> source, Matcher<T> matcher, MatchListener<? super T> listener, MatchDiagnostics diagnostics){
+			return new FilteringIterator<T>(source,matcher, listener, diagnostics);
 		}
 		
 		/**
 		 * @param source the backing iterator which provides the item to iterate over
 		 * @param filter the filter which filters the source iterator
 		 */
-		public FilteringIterator(Iterator<T> source, Matcher<T> matcher, JFindMatchListener<? super T> listener) {
+		public FilteringIterator(Iterator<T> source, Matcher<T> matcher, MatchListener<? super T> listener, MatchDiagnostics diagnostics) {
 			checkNotNull("soure", source);
 			checkNotNull("matcher", matcher);
 			checkNotNull("listener", listener);
@@ -164,6 +172,7 @@ public class DefaultFindResult<T> implements FindResult<T> {
 			this.source = source;
 			this.matcher = matcher;
 			this.listener = listener;
+			this.diagnostics = diagnostics;
 		}
 
 		@Override
@@ -188,7 +197,7 @@ public class DefaultFindResult<T> implements FindResult<T> {
 		private T nextItem() {
 			while (source.hasNext()) {
 				T item = source.next();
-				if (matcher.matches(item)) {
+				if (matcher.matches(item,diagnostics)) {
 					listener.onMatched(item);
 					return item;
 				} else {

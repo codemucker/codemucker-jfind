@@ -1,26 +1,16 @@
 package org.codemucker.jfind;
 
-import org.codemucker.jfind.JFind.Filter;
+import org.codemucker.jfind.ClassScanner.Filter;
 
 public class BaseFilter implements Filter {
 
-	@Override
+    @Override
     public boolean isIncludeRoot(Root root) {
         return true;
     }
-
-	@Override
-    public boolean isIncludeDir(RootResource resourceh) {
-        return true;
-    }
-
-	@Override
+    
+    @Override
     public boolean isIncludeResource(RootResource resource) {
-        return true;
-    }
-
-	@Override
-    public boolean isIncludeClassname(RootResource resource,String className) {
         return true;
     }
 
@@ -38,4 +28,6 @@ public class BaseFilter implements Filter {
     public boolean isInclude(Object obj) {
 	    return true;
     }
+
+    
 }

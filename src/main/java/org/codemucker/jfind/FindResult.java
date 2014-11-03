@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
 
 import com.google.common.base.Function;
@@ -28,7 +29,8 @@ public interface FindResult<T> extends Iterable<T> {
 	 * @return
 	 */
 	public FindResult<T> filter(Matcher<T> matcher);
-	public FindResult<T> filter(Matcher<T> matcher, JFindMatchListener<? super T> listener);
+	public FindResult<T> filter(Matcher<T> matcher, MatchListener<? super T> listener);
+    public FindResult<T> filter(Matcher<T> matcher, MatchListener<? super T> listener, MatchDiagnostics diagnostics);
 	
 	/**
 	 * Return a new view over the current results using the given predicate. If the predicate
@@ -63,6 +65,6 @@ public interface FindResult<T> extends Iterable<T> {
 		public K getKeyFor(V value);
 	}
 	
-	public interface Filter<T> extends Matcher<T>, JFindMatchListener<T>{
+	public interface Filter<T> extends Matcher<T>, MatchListener<T>{
 	}
 }

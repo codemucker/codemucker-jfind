@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.codemucker.jfind.JFindClass;
+import org.codemucker.jfind.ReflectedClass;
 import org.codemucker.jmatch.AString;
 import org.codemucker.jmatch.AbstractNotNullMatcher;
 import org.codemucker.jmatch.Description;
@@ -142,7 +142,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 
             @Override
             protected boolean matchesSafely(Class<?> actual, MatchDiagnostics diag) {
-                return JFindClass.from(actual).hasAnnotation(matcher);
+                return ReflectedClass.from(actual).hasAnnotation(matcher);
             }
 
             @Override
@@ -158,7 +158,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 
             @Override
             protected boolean matchesSafely(Class<?> actual, MatchDiagnostics diag) {                
-                return JFindClass.from(actual).hasFieldsMatching(matcher);
+                return ReflectedClass.from(actual).hasFieldsMatching(matcher);
             }
 
             @Override
@@ -174,7 +174,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 
             @Override
             protected boolean matchesSafely(Class<?> actual, MatchDiagnostics diag) {                
-                return JFindClass.from(actual).hasMethodMatching(matcher);
+                return ReflectedClass.from(actual).hasMethodMatching(matcher);
             }
 
             @Override
@@ -192,7 +192,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 	    return this;
     }
 	
-	public AClass notEnum() {
+	public AClass isNotEnum() {
 		addMatcher(Logical.not(MATCHER_ENUM));
 		return this;
 	}

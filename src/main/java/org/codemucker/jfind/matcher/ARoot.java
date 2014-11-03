@@ -81,11 +81,6 @@ public class ARoot extends PropertyMatcher<Root> {
         return this;
     }
     
-    public ARoot javaPackage(String path) {
-        path(path.replace('.', '/'));
-        return this;
-    }
-    
     public ARoot path(String path) {
         path(AString.equalTo(path));
         return this;
@@ -151,7 +146,7 @@ public class ARoot extends PropertyMatcher<Root> {
         return this;
     }
     
-    public ARoot containsSrc() {
+    public ARoot isSrc() {
         isContentType(new AbstractMatcher<RootContentType>() {
             @Override
             protected boolean matchesSafely(RootContentType actual, MatchDiagnostics diag) {

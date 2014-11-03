@@ -10,7 +10,7 @@ import org.codemucker.jtest.TestHelper;
 import org.junit.Test;
 
 
-public class ClasspathResourceTest {
+public class RootResourceTest {
 
 	TestHelper helper = new TestHelper();
 	

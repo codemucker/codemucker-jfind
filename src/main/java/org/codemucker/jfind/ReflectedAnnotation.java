@@ -4,22 +4,22 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class JFindAnnotation extends AbstractAccessibleObject {
+public class ReflectedAnnotation extends AbstractReflectedObject {
 
     private static final Class<?>[] NO_ARGS = new Class[] {};
     private static final Object[] NO_ARG_VALS = new Object[] {};
 
     private final Annotation anon;
 
-    public static JFindAnnotation from(Annotation anon) {
+    public static ReflectedAnnotation from(Annotation anon) {
         if (anon == null) {
             return null;
         }
         
-        return new JFindAnnotation(anon);
+        return new ReflectedAnnotation(anon);
     }
 
-    public JFindAnnotation(Annotation anon) {
+    public ReflectedAnnotation(Annotation anon) {
         super(anon.annotationType().getAnnotations(),anon.annotationType().getModifiers());
         this.anon = anon;
     }

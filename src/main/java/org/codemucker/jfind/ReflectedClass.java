@@ -7,18 +7,18 @@ import java.util.List;
 
 import org.codemucker.jmatch.Matcher;
 
-public class JFindClass extends AbstractAccessibleObject {
+public class ReflectedClass extends AbstractReflectedObject {
 
     private final Class<?> type;
 
-    public static JFindClass from(Class<?> type) {
+    public static ReflectedClass from(Class<?> type) {
         if (type == null) {
             return null;
         }
-        return new JFindClass(type);
+        return new ReflectedClass(type);
     }
 
-    public JFindClass(Class<?> type) {
+    public ReflectedClass(Class<?> type) {
         super(type.getAnnotations(), type.getModifiers());
         this.type = type;
     }

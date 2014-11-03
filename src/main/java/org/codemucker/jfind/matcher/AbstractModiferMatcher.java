@@ -1,6 +1,6 @@
 package org.codemucker.jfind.matcher;
 
-import org.codemucker.jfind.JavaModifier;
+import org.codemucker.jfind.ReflectedModifier;
 import org.codemucker.jmatch.AbstractNotNullMatcher;
 import org.codemucker.jmatch.Description;
 import org.codemucker.jmatch.MatchDiagnostics;
@@ -29,7 +29,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isAbstract(boolean b) {
-        modifier(b, JavaModifier.ABSTRACT);
+        modifier(b, ReflectedModifier.ABSTRACT);
         return self();
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isFinal(boolean b) {
-        modifier(b, JavaModifier.FINAL);
+        modifier(b, ReflectedModifier.FINAL);
         return self();
     }
 
@@ -59,7 +59,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isNative(boolean b) {
-        modifier(b, JavaModifier.NATIVE);
+        modifier(b, ReflectedModifier.NATIVE);
         return self();
     }
 
@@ -74,7 +74,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isPublic(boolean b) {
-        modifier(b, JavaModifier.PUBLIC);
+        modifier(b, ReflectedModifier.PUBLIC);
         return self();
     }
 
@@ -90,7 +90,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isPrivate(boolean b) {
-        modifier(b, JavaModifier.PRIVATE);
+        modifier(b, ReflectedModifier.PRIVATE);
         return self();
     }
 
@@ -105,7 +105,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isProtected(boolean b) {
-        modifier(b, JavaModifier.PROTECTED);
+        modifier(b, ReflectedModifier.PROTECTED);
         return self();
     }
 
@@ -120,7 +120,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isSynchronized(boolean b) {
-        modifier(b, JavaModifier.SYNCHRONIZED);
+        modifier(b, ReflectedModifier.SYNCHRONIZED);
         return self();
     }
 
@@ -135,7 +135,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isTransient(boolean b) {
-        modifier(b, JavaModifier.TRANSIENT);
+        modifier(b, ReflectedModifier.TRANSIENT);
         return self();
     }
 
@@ -150,7 +150,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isVolatile(boolean b) {
-        modifier(b, JavaModifier.VOLATILE);
+        modifier(b, ReflectedModifier.VOLATILE);
         return self();
     }
 
@@ -165,7 +165,7 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isStrict(boolean b) {
-        modifier(b, JavaModifier.STRICT);
+        modifier(b, ReflectedModifier.STRICT);
         return self();
     }
 
@@ -180,31 +180,31 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     }
 
     public TSelf isStatic(boolean b) {
-        modifier(b, JavaModifier.STATIC);
+        modifier(b, ReflectedModifier.STATIC);
         return self();
     }
 
-    public TSelf isModifier(final JavaModifier mod) {
+    public TSelf isModifier(final ReflectedModifier mod) {
         modifier(true, mod);
         return self();
     }
 
-    public TSelf isNotModifier(final JavaModifier mod) {
+    public TSelf isNotModifier(final ReflectedModifier mod) {
         modifier(false, mod);
         return self();
     }
 
     public TSelf isModifier(final int mod) {
-        modifier(true, JavaModifier.from(mod));
+        modifier(true, ReflectedModifier.from(mod));
         return self();
     }
 
     public TSelf isNotModifier(final int mod) {
-        modifier(false, JavaModifier.from(mod));
+        modifier(false, ReflectedModifier.from(mod));
         return self();
     }
 
-    private void modifier(final boolean expectMatch, final JavaModifier mod) {
+    private void modifier(final boolean expectMatch, final ReflectedModifier mod) {
         addMatcher(new AbstractNotNullMatcher<T>() {
 
             @Override

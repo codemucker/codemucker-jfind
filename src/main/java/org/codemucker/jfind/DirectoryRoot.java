@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.codemucker.lang.IBuilder;
+import org.codemucker.lang.PathUtil;
 
 import com.google.common.base.Objects;
 
@@ -83,7 +84,8 @@ public class DirectoryRoot implements Root {
 			//TODO:check relPath is in the given directory, no escaping up!
 			File f = new File(baseDir.getAbsolutePath(),relPath);
 			if(!f.exists()){
-                if (!f.getParentFile().mkdirs()) {
+			    f.getParentFile().mkdirs();
+                if (!f.getParentFile().exists()) {
                     throw new IOException("Couldn't create parent directories for full resource path '" + f.getAbsolutePath() + "'");
                 }
 				if(!f.createNewFile()){

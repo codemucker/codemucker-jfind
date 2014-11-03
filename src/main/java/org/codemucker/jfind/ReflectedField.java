@@ -2,18 +2,18 @@ package org.codemucker.jfind;
 
 import java.lang.reflect.Field;
 
-public class JFindField extends AbstractAccessibleObject {
+public class ReflectedField extends AbstractReflectedObject {
 
     private final Field field;
 
-    public static JFindField from(Field field) {
+    public static ReflectedField from(Field field) {
         if (field == null) {
             return null;
         }
-        return new JFindField(field);
+        return new ReflectedField(field);
     }
 
-    public JFindField(Field field) {
+    public ReflectedField(Field field) {
         super(field.getAnnotations(),field.getModifiers());
         this.field = field;
     }

@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.codemucker.jmatch.Matcher;
 
-public abstract class AbstractAccessibleObject {
+public abstract class AbstractReflectedObject {
 
     private final Annotation[] annotations;
     private final int modifiers;
 
-    public AbstractAccessibleObject(Annotation[] annotations, int modifiers) {
+    public AbstractReflectedObject(Annotation[] annotations, int modifiers) {
         super();
         this.annotations = annotations;
         this.modifiers = modifiers;
@@ -75,7 +75,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isAbstract(boolean b) {
-        return modifier(b, JavaModifier.ABSTRACT);
+        return modifier(b, ReflectedModifier.ABSTRACT);
     }
 
     public boolean isFinal() {
@@ -87,7 +87,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isFinal(boolean b) {
-        return modifier(b, JavaModifier.FINAL);
+        return modifier(b, ReflectedModifier.FINAL);
     }
 
     public boolean isNative() {
@@ -99,7 +99,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isNative(boolean b) {
-        return modifier(b, JavaModifier.NATIVE);
+        return modifier(b, ReflectedModifier.NATIVE);
     }
 
     public boolean isPublic() {
@@ -111,7 +111,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isPublic(boolean b) {
-        return modifier(b, JavaModifier.PUBLIC);
+        return modifier(b, ReflectedModifier.PUBLIC);
     }
 
     public boolean isPrivate() {
@@ -123,7 +123,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isPrivate(boolean b) {
-        return modifier(b, JavaModifier.PRIVATE);
+        return modifier(b, ReflectedModifier.PRIVATE);
     }
 
     public boolean isProtected() {
@@ -135,7 +135,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isProtected(boolean b) {
-        return modifier(b, JavaModifier.PROTECTED);
+        return modifier(b, ReflectedModifier.PROTECTED);
     }
 
     public boolean isSynchronized() {
@@ -147,7 +147,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isSynchronized(boolean b) {
-        return modifier(b, JavaModifier.SYNCHRONIZED);
+        return modifier(b, ReflectedModifier.SYNCHRONIZED);
     }
 
     public boolean isTransient() {
@@ -159,7 +159,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isTransient(boolean b) {
-        return modifier(b, JavaModifier.TRANSIENT);
+        return modifier(b, ReflectedModifier.TRANSIENT);
     }
 
     public boolean isVolatile() {
@@ -171,7 +171,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isVolatile(boolean b) {
-        return modifier(b, JavaModifier.VOLATILE);
+        return modifier(b, ReflectedModifier.VOLATILE);
     }
 
     public boolean isStrict() {
@@ -183,7 +183,7 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isStrict(boolean b) {
-        return modifier(b, JavaModifier.STRICT);
+        return modifier(b, ReflectedModifier.STRICT);
     }
 
     public boolean isStatic() {
@@ -195,26 +195,26 @@ public abstract class AbstractAccessibleObject {
     }
 
     public boolean isStatic(boolean b) {
-        return modifier(b, JavaModifier.STATIC);
+        return modifier(b, ReflectedModifier.STATIC);
     }
 
-    public boolean isModifier(final JavaModifier mod) {
+    public boolean isModifier(final ReflectedModifier mod) {
         return modifier(true, mod);
     }
 
-    public boolean isNotModifier(final JavaModifier mod) {
+    public boolean isNotModifier(final ReflectedModifier mod) {
         return modifier(false, mod);
     }
 
     public boolean isModifier(final int mod) {
-        return modifier(true, JavaModifier.from(mod));
+        return modifier(true, ReflectedModifier.from(mod));
     }
 
     public boolean isNotModifier(final int mod) {
-        return modifier(false, JavaModifier.from(mod));
+        return modifier(false, ReflectedModifier.from(mod));
     }
 
-    private boolean modifier(final boolean expectMatch, final JavaModifier mod) {
+    private boolean modifier(final boolean expectMatch, final ReflectedModifier mod) {
         boolean matched = mod.is(modifiers);
         return expectMatch ? matched : !matched;
     }

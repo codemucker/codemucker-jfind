@@ -36,62 +36,47 @@ import org.codemucker.jmatch.AString;
 import org.junit.Test;
 
 
-public class JFinderTest {
-
-//	@Test
-//	public void test_find_class_dir() {
-//		ClassFinder.newBuilder().build();
-//		ClassFinder finder = new ClassFinder();
-//		File dir = finder.findClassesDir();
-//		assertNotNull(dir);
-//		String path = convertToForwardSlashes(dir.getPath());
-//		assertTrue(path.endsWith("/target/classes"));
-//	}
-
-//	private String convertToForwardSlashes(String path) {
-//		return path.replace('\\', '/');
-//	}
-	
+public class ClassScannerTest {
 
 	@Test
 	public void test_find_classes_dir() {
-		JFind finderDefault = newFinderBuilder()
+		ClassScanner finderDefault = newFinderBuilder()
 			.build();
 			
-		JFind finderWithout = newFinderBuilder()
-				.roots(Roots.with().build())
+		ClassScanner finderWithout = newFinderBuilder()
+				.scanRoots(Roots.with().build())
 			.build();
 		
-		JFind finderWith = newFinderBuilder()
-				.roots(Roots.with()
+		ClassScanner finderWith = newFinderBuilder()
+				.scanRoots(Roots.with()
 					.mainCompiledDir(true)
 					.testCompiledDir(true).build())
 			.build();
 
 		Collection<Class<?>> foundDefault = list(finderDefault.findClasses());
 		assertNotNull(foundDefault);
-		assertTrue(foundDefault.contains(JFind.class));
-		assertTrue(foundDefault.contains(JFinderTest.class));
+		assertTrue(foundDefault.contains(ClassScanner.class));
+		assertTrue(foundDefault.contains(ClassScannerTest.class));
 		
 		Collection<Class<?>> foundWithout = list(finderWithout.findClasses());
 		assertNotNull(foundWithout);
-		assertFalse(foundWithout.contains(JFind.class));
-		assertFalse(foundWithout.contains(JFinderTest.class));
+		assertFalse(foundWithout.contains(ClassScanner.class));
+		assertFalse(foundWithout.contains(ClassScannerTest.class));
 		
 		Collection<Class<?>> foundWith = list(finderWith.findClasses());
 		assertNotNull(foundWith);
-		assertTrue(foundWith.contains(JFind.class));
-		assertTrue(foundWith.contains(JFinderTest.class));
+		assertTrue(foundWith.contains(ClassScanner.class));
+		assertTrue(foundWith.contains(ClassScannerTest.class));
 	}
 	
 	@Test
 	public void test_find_test_classes() {
-		JFind finderNoTests = newFinderBuilder()
-			.roots(Roots.with().mainCompiledDir(true).build())
+		ClassScanner finderNoTests = newFinderBuilder()
+			.scanRoots(Roots.with().mainCompiledDir(true).build())
 			.build();
 		
-		JFind finderTests = newFinderBuilder()
-			.roots(Roots.with()
+		ClassScanner finderTests = newFinderBuilder()
+			.scanRoots(Roots.with()
 				.mainCompiledDir(true)
 				.testCompiledDir(true)
 				.build()
@@ -99,70 +84,74 @@ public class JFinderTest {
 			.build();
 
 		Collection<Class<?>> foundNoTests = list(finderNoTests.findClasses());
-		assertTrue(foundNoTests.contains(JFind.class));
-		assertFalse(foundNoTests.contains(JFinderTest.class));
+		assertTrue(foundNoTests.contains(ClassScanner.class));
+		assertFalse(foundNoTests.contains(ClassScannerTest.class));
 		
 		Collection<Class<?>> foundTests = list(finderTests.findClasses());		
-		assertTrue(foundTests.contains(JFind.class));
-		assertTrue(foundTests.contains(JFinderTest.class));
+		assertTrue(foundTests.contains(ClassScanner.class));
+		assertTrue(foundTests.contains(ClassScannerTest.class));
 	}
 	
 	@Test
 	public void test_filename_exclude(){
-		JFind finderWith = newFinderBuilder()
+		ClassScanner finderWith = newFinderBuilder()
 			.build();
 			
-		JFind finderWithout = newFinderBuilder()
-		        .excludeResource(AResource.with().pathMatchingAntPattern("**Exception*.class"))
+		ClassScanner finderWithout = newFinderBuilder()
+		        .filter(ClassFilter.with()
+		                .resourceMatches(AResource.not(AResource.with().pathMatchingAntPattern("**Exception*.class"))))
 			.build();
 		
 		Collection<Class<?>> foundWith = list(finderWith.findClasses());		
-		assertTrue(foundWith.contains(JFind.class));
+		assertTrue(foundWith.contains(ClassScanner.class));
 		assertTrue(foundWith.contains(JFindException.class));
 
 		Collection<Class<?>> foundWithout = list(finderWithout.findClasses());
-		assertTrue(foundWithout.contains(JFind.class));
+		assertTrue(foundWithout.contains(ClassScanner.class));
 		assertFalse(foundWithout.contains(JFindException.class));
 	}
 	
 	@Test
 	public void test_filename_exclude_pkg(){
-		JFind finderWith = newFinderBuilder()
+		ClassScanner finderWith = newFinderBuilder()
 			.build();
 			
-		JFind finderWithout = newFinderBuilder()
-			.excludeResource(ARootResource.with().path(AString.matchingAntPattern("**/b/**")))
+		ClassScanner finderWithout = newFinderBuilder()
+		        .filter(ClassFilter.with()
+                        .resourceMatches(AResource.not(ARootResource.with().path(AString.matchingAntPattern("**/b/**")))))
 			.build();
 
 		Collection<Class<?>> foundWith = list(finderWith.findClasses());
-		assertTrue(foundWith.contains(JFind.class));
+		assertTrue(foundWith.contains(ClassScanner.class));
 		assertTrue(foundWith.contains(TstBeanOne.class));		
 		assertTrue(foundWith.contains(TstBeanTwo.class));
 		
 		Collection<Class<?>> foundWithout = list(finderWithout.findClasses());
-		assertTrue(foundWithout.contains(JFind.class));
+		assertTrue(foundWithout.contains(ClassScanner.class));
 		assertTrue(foundWithout.contains(TstBeanOne.class));		
 		assertFalse(foundWithout.contains(TstBeanTwo.class));
 	}
 
 	@Test
 	public void test_filename_exclude_target_has_no_effect(){
-		JFind finder = newFinderBuilder()
-			.excludeResource(ARootResource.with().path(AString.matchingAntPattern("**/target/**")))
+		ClassScanner finder = newFinderBuilder()
+		        .filter(ClassFilter.with()
+                        .resourceMatches(AResource.not(ARootResource.with().path(AString.matchingAntPattern("**/target/**")))))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
 
-		assertTrue(found.contains(JFind.class));
+		assertTrue(found.contains(ClassScanner.class));
 	}
 	
 	@Test
 	public void test_filename_include(){
-		JFind finderNoInclude = newFinderBuilder()
+		ClassScanner finderNoInclude = newFinderBuilder()
 			.build();
 			
-		JFind finderInclude = newFinderBuilder()
-			.includeResource(ARootResource.with().path("*/a/*"))
+		ClassScanner finderInclude = newFinderBuilder()
+		        .filter(ClassFilter.with()
+                        .resourceMatches(ARootResource.with().path("*/a/*")))
 			.build();
 
 		Collection<Class<?>> foundNoInclude = list(finderNoInclude.findClasses());
@@ -174,32 +163,23 @@ public class JFinderTest {
 	
 	@Test
 	public void test_filename_include_multiple_packages(){
-		JFind finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.matchingAntPattern("**/a/**")))
-			.includeResource(ARootResource.with().path(AString.matchingAntPattern("**/b/**")))
+		ClassScanner finder = newFinderBuilder()
+		        .filter(ClassFilter.with()
+                        .resourceMatches(AResource.any(
+                                ARootResource.with().path(AString.matchingAntPattern("**/a/**")),
+                                ARootResource.with().path(AString.matchingAntPattern("**/b/**")))))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
 
 		assertTrue(found.contains(TstBeanTwo.class));
 	}
-	
-	@Test
-	public void test_filename_exclude_trumps_include(){
-		JFind finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.matchingAntPattern("**/a/**")))
-			.excludeResource(ARootResource.with().path(AString.matchingAntPattern("**/a/**")))
-			.build();
-			
-		Collection<Class<?>> found = list(finder.findClasses());
 
-		assertFalse(found.contains(TstBeanOne.class));
-	}
-	
 	@Test
 	public void test_include_instance_of(){
-		JFind finder = newFinderBuilder()
-			.includeClass(AClass.that().isASubclassOf(TstInterface1.class))
+		ClassScanner finder = newFinderBuilder()
+                .filter(ClassFilter.with()
+                        .classMatches(AClass.that().isASubclassOf(TstInterface1.class)))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -213,9 +193,11 @@ public class JFinderTest {
 
 	@Test
 	public void test_multiple_implements(){
-		JFind finder = newFinderBuilder()
-			.includeClass(AClass.that().isASubclassOf(TstInterface1.class))
-			.includeClass(AClass.that().isASubclassOf(TstInterface2.class))	
+		ClassScanner finder = newFinderBuilder()
+	              .filter(ClassFilter.with()
+                     .classMatches(AClass.any(
+                         AClass.that().isASubclassOf(TstInterface1.class),
+                         AClass.that().isASubclassOf(TstInterface2.class))))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -231,10 +213,11 @@ public class JFinderTest {
 
 	@Test
 	public void test_class_must_match_multiple_matchers(){
-		JFind finder = newFinderBuilder()
-			.includeClass(AClass.all(
-					AClass.that().isASubclassOf(TstInterface1.class),
-					AClass.that().isASubclassOf(TstInterface2.class)))	
+		ClassScanner finder = newFinderBuilder()
+		        .filter(ClassFilter.with()
+		                 .classMatches(AClass.all(
+		                         AClass.that().isASubclassOf(TstInterface1.class),
+		                         AClass.that().isASubclassOf(TstInterface2.class)))	)
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -246,7 +229,7 @@ public class JFinderTest {
 
 	@Test
 	public void test_find_enums(){
-		JFind finder = newFinderBuilder().build();
+		ClassScanner finder = newFinderBuilder().build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
 
@@ -257,8 +240,9 @@ public class JFinderTest {
 	
 	@Test
 	public void test_filter_enum(){
-		JFind finder = newFinderBuilder()
-		    .excludeClass(AClass.that().isEnum())
+		ClassScanner finder = newFinderBuilder()
+		    .filter(ClassFilter.with()
+		             .classMatches(AClass.that().isNotEnum()))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -272,9 +256,10 @@ public class JFinderTest {
 	
 	@Test
 	public void test_filter_anonymous(){
-		JFind finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.matchingAntPattern("**/c/**")))
-			.excludeClass(AClass.that().isAnonymous())
+		ClassScanner finder = newFinderBuilder()
+		   .filter(ClassFilter.with()
+		                .resourceMatches(ARootResource.with().path(AString.matchingAntPattern("**/c/**")))
+		                .classMatches(AClass.that().isNotAnonymous()))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -284,9 +269,10 @@ public class JFinderTest {
 	
 	@Test
 	public void test_filter_inner_class(){
-		JFind finder = newFinderBuilder()
-			.includeResource(ARootResource.with().path(AString.matchingAntPattern("**/d/**")))
-			.excludeClass(AClass.that().isInnerClass())
+		ClassScanner finder = newFinderBuilder()
+			.filter(ClassFilter.with()
+			            .resourceMatches(ARootResource.with().path(AString.matchingAntPattern("**/d/**")))
+			            .classMatches(AClass.that().isNotInner()))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -296,8 +282,8 @@ public class JFinderTest {
 	
 	@Test
 	public void test_filter_interfaces(){
-		JFind finder = newFinderBuilder()
-			.excludeClass(AClass.that().isInterface())
+		ClassScanner finder = newFinderBuilder()
+			.filter(ClassFilter.with().classMatches(AClass.that().isNotInterface()))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -311,8 +297,9 @@ public class JFinderTest {
 	
 	@Test
 	public void test_find_has_annotations(){
-		JFind finder = newFinderBuilder()			
-			.includeClass(AClass.with().annotation(TstAnnotation.class))
+		ClassScanner finder = newFinderBuilder()			
+			.filter(ClassFilter.with()
+			        .classMatches(AClass.with().annotation(TstAnnotation.class)))
 			.build();
 
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -320,9 +307,9 @@ public class JFinderTest {
 		assertEquals(list(TstAnnotationBean.class), found);
 	}
 	
-	private static Criteria newFinderBuilder(){
-		return Criteria.with()
-            			.roots(Roots.with()
+	private static ClassScanner.Builder newFinderBuilder(){
+		return ClassScanner.with()
+            			.scanRoots(Roots.with()
             				.mainCompiledDir(true)
             				.testCompiledDir(true)
             				.build()
