@@ -30,7 +30,7 @@ public class AField extends AbstractModiferMatcher<AField,Field>{
 	}
 	
 	public AField name(Matcher<String> matcher){
-		addMatchProperty("name", String.class, matcher);
+		matchProperty("name", String.class, matcher);
 		return this;
 	}
 

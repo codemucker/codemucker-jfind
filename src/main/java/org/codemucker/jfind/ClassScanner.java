@@ -14,6 +14,8 @@ import org.codemucker.jfind.Root.RootType;
 import org.codemucker.lang.IBuilder;
 import org.codemucker.lang.PathUtil;
 
+import com.google.common.base.Function;
+
 public class ClassScanner {
 
     public static interface Filter {
@@ -74,6 +76,16 @@ public class ClassScanner {
             }
         }
         return newArrayList(map.values());
+    }
+
+    public FindResult<ReflectedClass> findReflectedClasses() {
+        return findClasses().transform(new Function<Class<?>, ReflectedClass>() {
+
+            @Override
+            public ReflectedClass apply(Class<?> input) {
+                return ReflectedClass.from(input);
+            }
+        });
     }
 
     public FindResult<Class<?>> findClasses() {

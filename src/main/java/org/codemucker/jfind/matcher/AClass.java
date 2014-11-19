@@ -103,7 +103,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
     }
     
     public AClass name(Matcher<String> matcher){
-        addMatchProperty("name", String.class, matcher);
+        matchProperty("name", String.class, matcher);
         return this;
     }
 
@@ -142,7 +142,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 
             @Override
             protected boolean matchesSafely(Class<?> actual, MatchDiagnostics diag) {
-                return ReflectedClass.from(actual).hasAnnotation(matcher);
+                return actual.getAnnotations().length > 0 && ReflectedClass.from(actual).hasAnnotation(matcher);
             }
 
             @Override
