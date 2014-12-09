@@ -13,6 +13,8 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.print.DocFlavor.STRING;
+
 import org.codemucker.lang.IBuilder;
 import org.codemucker.lang.PathUtil;
 
@@ -150,11 +152,14 @@ public class DirectoryRoot implements Root {
         return ts;
     }
     
-    private File getByRelPath(String relpath){
-        validatePath(relpath);
-		return new File(baseDir.getAbsolutePath(),relpath);
+	private File getByRelPath(String relpath) {
+		validatePath(relpath);
+		if (relpath.charAt(0) != '/') {
+			relpath = '/' + relpath;
+		}
+		return new File(baseDir.getAbsolutePath(), relpath);
 	}
-	
+    
 	@Override
 	public URL toURL(){
 	    try {

@@ -127,6 +127,15 @@ public class DefaultFindResult<T> implements FindResult<T> {
 	}
 	
 	@Override
+	public T getFirstOrNull() {
+		Iterator<T> iter = iterator();
+		if (iter.hasNext()) {
+			return iter.next();
+		}
+		return null;
+	}
+	
+	@Override
 	public <B> FindResult<B> transform(Function<T, B> transformFunc) {
 		return from(SingleTransformIterator.from(this.iterator(),transformFunc));
 	}

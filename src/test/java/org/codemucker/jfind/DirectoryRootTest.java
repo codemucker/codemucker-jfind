@@ -36,9 +36,9 @@ public class DirectoryRootTest {
 			is(AList.of(RootResource.class)
 				.inAnyOrder()
 				.withAtLeast()
-				.item(ARootResource.with().pathFromClass(TstBeanOne.class))
-				.item(ARootResource.with().pathFromClass(TstBeanTwo.class))
-				.item(ARootResource.with().pathFromClass(DirectoryRootTest.class)))
+				.item(ARootResource.with().className(TstBeanOne.class))
+				.item(ARootResource.with().className(TstBeanTwo.class))
+				.item(ARootResource.with().className(DirectoryRootTest.class)))
 		);
 	}
 }

@@ -37,9 +37,10 @@ public class PredicateToFindFilterAdapter<T> extends AbstractNotNullMatcher<T> i
 	}
 
 	@Override
-	public void onError(Object record, Exception e) throws Exception { 
-		throw e;
+	public void onError(Object record, Throwable t) throws Throwable { 
+		throw t;
 	}
+	
 	@Override
 	public void describeTo(Description desc) {
 		super.describeTo(desc);

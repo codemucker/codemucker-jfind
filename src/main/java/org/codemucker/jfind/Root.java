@@ -18,11 +18,14 @@ public interface Root {
 	 * Provide some default categorisation of the root type so that tooling can decide where to 
 	 * place newly generated resources, or decide if a root is to be used for a given type of processing
 	 * or searching
+	 * 
+	 * TODO:rename to RooCategory
 	 */
 	public static enum RootType {
     	MAIN
     	, TEST
     	, DEPENDENCY
+    	, /** The JVM and related jars */ SYSTEM
     	, GENERATED
     	, UNKNOWN;
     }

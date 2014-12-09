@@ -25,7 +25,9 @@ public class ClassScanner {
 
         public boolean isIncludeResource(RootResource resource);
 
-        public boolean isIncludeClass(RootResource resource,Class<?> classToMatch);
+        public boolean isIncludeClassResource(ClassResource resource);
+
+        public boolean isIncludeClass(Class<?> classToMatch);
 
         public boolean isIncludeArchive(RootResource archiveFile);
     }
@@ -43,8 +45,8 @@ public class ClassScanner {
         }
 
         @Override
-        public void onError(Object record, Exception e) throws Exception {
-            throw new JFindException(String.format("Error processing '%s'", record),e);
+        public void onError(Object record, Throwable t) throws Exception {
+            throw new JFindException(String.format("Error processing '%s'", record),t);
             //log.warn(String.format("Error processing '%s'", record),e);
             
         }
@@ -104,19 +106,19 @@ public class ClassScanner {
         Class<?> loadedClass = null;
         try {
             loadedClass = loadClass(className);
-            if (filter.isInclude(loadedClass) && filter.isIncludeClass(resource,loadedClass)) {
+            if (filter.isInclude(loadedClass) && filter.isIncludeClass(loadedClass)) {
                 listener.onMatched(loadedClass);
                 foundClasses.add(loadedClass);
             } else {
                 listener.onIgnored(loadedClass);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // allow clients to ignore errors if they want
             try {
                 listener.onError(resource, e);
             } catch(RuntimeException rethrown){
                 throw rethrown;
-            } catch (Exception rethrown) {
+            } catch (Throwable rethrown) {
                 throw new JFindException("error loading class", rethrown);
             }
         }
@@ -139,17 +141,25 @@ public class ClassScanner {
     }
 
     private Collection<ClassResource> findClassNames(Iterable<RootResource> resources) {
-        Collection<ClassResource> foundClassNames = newArrayList();
+        Collection<ClassResource> found = newArrayList();
         for (RootResource resource : resources) {
-            walkClassNames(foundClassNames, resource);
+            walkClassNames(found, resource);
         }
-        return foundClassNames;
+        return found;
     }
 
-    private void walkClassNames(Collection<ClassResource> foundClassNames, RootResource resource) {
+    private void walkClassNames(Collection<ClassResource> found, RootResource resource) {
         if (resource.hasExtension("class")) {
             String className = PathUtil.filePathToClassNameOrNull(resource.getRelPath());
-            foundClassNames.add(new ClassResource(resource, className));
+            if(className != null){
+            	ClassResource classResource = new ClassResource(resource, className);
+            	 if (filter.isInclude(classResource) && filter.isIncludeClassResource(classResource)) {
+                     listener.onMatched(classResource);
+                     found.add(classResource);
+                 } else {
+                	 listener.onIgnored(classResource);
+                 }
+            }
         }
     }
 

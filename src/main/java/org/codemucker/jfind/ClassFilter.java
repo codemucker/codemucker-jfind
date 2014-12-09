@@ -38,9 +38,14 @@ public class ClassFilter implements Filter{
 	public boolean isIncludeRoot(Root root) {
 		return rootMatcher.matches(root);
 	}
-	
+
 	@Override
-	public boolean isIncludeClass(RootResource resource,Class<?> classToMatch) {
+	public boolean isIncludeClassResource(ClassResource resource) {
+		return true;
+	}
+
+	@Override
+	public boolean isIncludeClass(Class<?> classToMatch) {
 		return classMatcher.matches(classToMatch);
 	}
 	

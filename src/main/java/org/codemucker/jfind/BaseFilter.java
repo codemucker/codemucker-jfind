@@ -15,7 +15,13 @@ public class BaseFilter implements Filter {
     }
 
 	@Override
-    public boolean isIncludeClass(RootResource resource,Class<?> classToMatch) {
+    public boolean isIncludeClassResource(ClassResource resource) {
+        return true;
+    }
+
+	
+	@Override
+    public boolean isIncludeClass(Class<?> classToMatch) {
         return true;
     }
 

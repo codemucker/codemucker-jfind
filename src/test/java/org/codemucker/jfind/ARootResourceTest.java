@@ -11,6 +11,7 @@ public class ARootResourceTest {
 	@Test
 	public void matchRelPath(){
 		Assert.assertTrue(ARootResource.with().path("/a/b/c").matches(new RootResource(newTmpRoot(), "/a/b/c")));
+		Assert.assertTrue(ARootResource.with().path("/a/b/c").matches(new RootResource(newTmpRoot(), "a/b/c")));
 	}
 	
 	@Test

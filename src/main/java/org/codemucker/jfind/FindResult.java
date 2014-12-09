@@ -61,6 +61,8 @@ public interface FindResult<T> extends Iterable<T> {
 
 	public T getFirst();
 	
+	public T getFirstOrNull();
+	
 	public static interface KeyProvider<K,V> {
 		public K getKeyFor(V value);
 	}

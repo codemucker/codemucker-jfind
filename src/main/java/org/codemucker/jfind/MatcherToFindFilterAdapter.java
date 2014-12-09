@@ -36,8 +36,8 @@ public class MatcherToFindFilterAdapter<T> extends AbstractNotNullMatcher<T> imp
 	}
 
 	@Override
-	public void onError(Object record, Exception e) throws Exception { 
-		throw e;
+	public void onError(Object record, Throwable t) throws Throwable { 
+		throw t;
 	}
 	
 	@Override

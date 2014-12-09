@@ -30,7 +30,7 @@ import org.codemucker.jfind.d.TstInner;
 import org.codemucker.jfind.e.TstAnnotation;
 import org.codemucker.jfind.e.TstAnnotationBean;
 import org.codemucker.jfind.matcher.AClass;
-import org.codemucker.jfind.matcher.AResource;
+import org.codemucker.jfind.matcher.ARootResource;
 import org.codemucker.jfind.matcher.ARootResource;
 import org.codemucker.jmatch.AString;
 import org.junit.Test;
@@ -99,7 +99,7 @@ public class ClassScannerTest {
 			
 		ClassScanner finderWithout = newFinderBuilder()
 		        .filter(ClassFilter.with()
-		                .resourceMatches(AResource.not(AResource.with().pathMatchingAntPattern("**Exception*.class"))))
+		                .resourceMatches(ARootResource.not(ARootResource.with().pathMatchingAntPattern("**Exception*.class"))))
 			.build();
 		
 		Collection<Class<?>> foundWith = list(finderWith.findClasses());		
@@ -118,7 +118,7 @@ public class ClassScannerTest {
 			
 		ClassScanner finderWithout = newFinderBuilder()
 		        .filter(ClassFilter.with()
-                        .resourceMatches(AResource.not(ARootResource.with().path(AString.matchingAntPattern("**/b/**")))))
+                        .resourceMatches(ARootResource.not(ARootResource.with().path(AString.matchingAntPattern("**/b/**")))))
 			.build();
 
 		Collection<Class<?>> foundWith = list(finderWith.findClasses());
@@ -136,7 +136,7 @@ public class ClassScannerTest {
 	public void test_filename_exclude_target_has_no_effect(){
 		ClassScanner finder = newFinderBuilder()
 		        .filter(ClassFilter.with()
-                        .resourceMatches(AResource.not(ARootResource.with().path(AString.matchingAntPattern("**/target/**")))))
+                        .resourceMatches(ARootResource.not(ARootResource.with().path(AString.matchingAntPattern("**/target/**")))))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());
@@ -165,7 +165,7 @@ public class ClassScannerTest {
 	public void test_filename_include_multiple_packages(){
 		ClassScanner finder = newFinderBuilder()
 		        .filter(ClassFilter.with()
-                        .resourceMatches(AResource.any(
+                        .resourceMatches(ARootResource.any(
                                 ARootResource.with().path(AString.matchingAntPattern("**/a/**")),
                                 ARootResource.with().path(AString.matchingAntPattern("**/b/**")))))
 			.build();

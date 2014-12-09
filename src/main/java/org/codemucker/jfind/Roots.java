@@ -48,6 +48,7 @@ public final class Roots  {
 		private boolean includeClasspath = false;
 		
 		private Set<String> archiveTypes = Sets.newHashSet("jar","zip","ear","war");
+		private Set<String> ignoreTypes = Sets.newHashSet("so" /* unix libs */);
 
 		private boolean includeMainCompiledDir = false;
 		private boolean includeTestCompiledDir = false;	
@@ -237,7 +238,7 @@ public final class Roots  {
 	    }
 	
 		public Builder roots(Collection<File> paths) {
-			for( File path:paths){
+			for(File path:paths){
 				root(path);
 			}
 	    	return this;
@@ -274,12 +275,14 @@ public final class Roots  {
         }
 		
 		public Builder root(File path) {
-			if( path.isFile()){
+			if(path.isFile()){
 				String extension = Files.getFileExtension(path.getName()).toLowerCase();
 				if(archiveTypes.contains(extension)){
 					root(new ArchiveRoot(path,RootType.DEPENDENCY, RootContentType.BINARY));	
 				} else {
-					throw new IllegalArgumentException("Don't currently know how to handle roots with file extension ." + extension); 
+					if(!ignoreTypes.contains(extension)){
+						throw new IllegalArgumentException("Don't currently know how to handle roots with file extension '." + extension + "' (for path '" +path.getAbsolutePath() + "')"); 
+					}
 				}
 			} else {
 				root(new DirectoryRoot(path,RootType.DEPENDENCY,RootContentType.BINARY));

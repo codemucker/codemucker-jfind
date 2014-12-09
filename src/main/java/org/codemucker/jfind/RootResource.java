@@ -21,8 +21,16 @@ public class RootResource  {
 
 	public RootResource(Root root, String relPath) {
 		this.root = checkNotNull(root,"expect class path root");
-		this.relPath = PathUtil.toForwardSlashes(checkNotNull(relPath,"expect relative path"));
+		this.relPath = cleanRelPath(checkNotNull(relPath,"expect relative path"));
 		this.depth = countForwardSlashes(relPath);
+	}
+
+	private static String cleanRelPath(String path) {
+		path = PathUtil.toForwardSlashes(path);
+		if (path.charAt(0) != '/') {
+			path = '/' + path;
+		}
+		return path;
 	}
 	
 	private static int countForwardSlashes(String s){
