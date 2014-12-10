@@ -11,6 +11,10 @@ public class ClassFilter implements Filter{
 	private final Matcher<RootResource> resourceMatcher;
 	private final Matcher<Class<?>> classMatcher;
 	
+	public static Builder where(){
+		return with();
+	}
+	
 	public static Builder with(){
 		return new Builder();
 	}

@@ -2,7 +2,12 @@ package org.codemucker.jfind.matcher;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.TreeMap;
 
 import org.codemucker.jfind.ReflectedClass;
 import org.codemucker.jmatch.AString;
@@ -11,6 +16,8 @@ import org.codemucker.jmatch.Description;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
+import org.codemucker.jmatch.expression.AbstractMatchBuilderCallback;
+import org.codemucker.jmatch.expression.ExpressionParser;
 
 public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 
@@ -97,12 +104,46 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
     	return Logical.none();
     }
     
-    public AClass name(String fullName){
-        name(AString.matchingAntPattern(fullName));
+    /**
+     * Converts a logical expression using {@link ExpressionParser}} into a matcher. The names in the expression are converted into no arg 
+     * method calls on this matcher as in X,isX ==&gt; isX()  (case insensitive) 
+     * 
+     *  <p>
+     * E.g.
+     *  <ul>
+     *  <li> 
+     *  <li>Abstract==&gt; isAbstract()
+     *  <li>IsAstract ==&gt; isAbstract()
+     *  <li>Anonymous,isAnonymous==&gt; isAnonymous()
+     *  
+     *  </ul>
+     *  </p>
+     * @return
+     */
+    public AClass expression(String expression){
+    	if(!isBlank(expression)){
+	    	Matcher<Class<?>> matcher = ExpressionParser.parse(expression, new ClassMatchBuilderCallback());
+	    	if( matcher instanceof AClass){ //make the matching are bit faster by directly running the matchers directly
+	    		for(Matcher<Class<?>> m:((AClass)matcher).getMatchers()){
+	    			addMatcher(m);
+	    		}
+	    	} else {
+	    		addMatcher(matcher);
+	    	}
+    	}
+    	return this;
+    }
+    
+    private boolean isBlank(String s){
+    	return s==null || s.trim().length() == 0;
+    }
+    
+    public AClass fullName(String fullName){
+        fullName(AString.matchingAntPattern(fullName));
         return this;
     }
     
-    public AClass name(Matcher<String> matcher){
+    public AClass fullName(Matcher<String> matcher){
         matchProperty("name", String.class, matcher);
         return this;
     }
@@ -188,7 +229,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 	public AClass isPublicConcreteClass() {
 	    isNotAnonymous();
 	    isNotInterface();
-	    isNotInner();
+	    isNotInnerClass();
 	    return this;
     }
 	
@@ -202,7 +243,7 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 		return this;
 	}
 
-	public AClass isNotInner() {
+	public AClass isNotInnerClass() {
 		addMatcher(Logical.not(MATCHER_INNER_CLASS));
 		return this;
 	}
@@ -232,5 +273,44 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 		return this;
 	}
 
+    private static class ClassMatchBuilderCallback extends AbstractMatchBuilderCallback<Class<?>>{
 
+    	private static final Object[] NO_ARGS = new Object[]{};
+    	
+    	private static Map<String, Method> methodMap = new TreeMap<>();
+    	
+    	private static Matcher<Method> methodMatcher  = AMethod.that().isPublic().isNotAbstract().numArgs(0).isNotVoidReturn().name("is*");
+    	
+    	static {
+    		for(Method m : AClass.class.getDeclaredMethods()){
+    			if(methodMatcher.matches(m)){
+    				methodMap.put(m.getName().toLowerCase(),m);
+    				if(m.getName().startsWith("is")){
+    					methodMap.put(m.getName().substring(2).toLowerCase(),m);
+    				}
+    			}
+    		}
+    	}
+
+		@Override
+		protected Matcher<Class<?>> newMatcher(String expression) {
+			// TODO Auto-generated method stub
+			AClass matcher = AClass.with();
+			String key = expression.trim().toLowerCase();
+			Method m = methodMap.get(key);
+			if( m==null){
+				throw new NoSuchElementException("Could not find method '" + expression.trim() + " on " + AClass.class.getName() + ",options are " + Arrays.toString(methodMap.keySet().toArray()) + "");
+			}
+			try {
+				m.invoke(matcher, NO_ARGS);
+			} catch (IllegalAccessException | IllegalArgumentException e) {
+				//should never be thrown
+				throw new ExpressionParser.ParseException("Error calling " + AClass.class.getName() + "." + m.getName() + "() from expression '" + expression + "'",e);
+			}catch (InvocationTargetException e) {
+				//should never be thrown
+				throw new ExpressionParser.ParseException("Error calling " + AClass.class.getName() + "." + m.getName() + "() from expression '" + expression + "'",e.getTargetException());
+			}
+			return matcher;
+		}
+    }
 }

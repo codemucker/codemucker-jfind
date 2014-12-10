@@ -13,6 +13,9 @@ import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
 import org.codemucker.jmatch.PropertyMatcher;
+import org.codemucker.jmatch.expression.AbstractMatchBuilderCallback;
+import org.codemucker.jmatch.expression.ExpressionParser;
+import org.codemucker.jpattern.Dependency;
 
 public class ARoot extends PropertyMatcher<Root> {
 
@@ -56,10 +59,58 @@ public class ARoot extends PropertyMatcher<Root> {
         return this;
     }
 
-    public ARoot dependency(String group, String artifactId) {
+    public ARoot dependenciesExpression(String expression) {
+    	if(expression != null && expression.trim().length() != 0){
+    		Matcher<Root> matcher = ExpressionParser.parse(expression, new RootMatchBuilderCallback());
+    		if(matcher instanceof ARoot){ //make the matching are bit faster by directly running the matchers directly
+    			for(Matcher<Root> m:((ARoot)matcher).getMatchers()){
+    				addMatcher(m);
+    			}
+    		} else {
+    			addMatcher(matcher);
+    		}
+    	}
+        return this;
+    }
+    
+    public ARoot dependencies(Dependency... dependencies) {
+    	for (Dependency dep : dependencies) {
+            dependency(dep.group(), dep.artifact(), dep.classifier(), dep.extension());
+        }
+        return this;
+    }
+    
+    public ARoot dependency(String mavenDependency) {
+    	String[] parts = mavenDependency.split(":");
+    	String group = get(0,parts);
+    	String artifactId = get(1,parts);
+    	String classifier = get(2,parts);
+    	String extension = get(3,parts);
+    	
+    	dependency(group, artifactId, classifier, extension);
+    	return this;
+    }
+    
+    private static String get(int pos,String[] parts){
+    	if(pos >= parts.length){
+    		return null;
+    	}
+    	String s = parts[pos];
+    	if(s==null){
+    		return null;
+    	}
+    	s=s.trim();
+    	return s.length()==0?null:s;
+    }
+    
+    public ARoot dependency(String group, String artifactId, String classifier, String extension) {
         //e.g. //projectlombok\lombok\1.14.8\lombok-1.14.8.jar
-        String groupPath = group.replace('.', '/');
-        final Matcher<String> dependencyPathMatcher = AString.matchingAntPattern("**" +groupPath + "/" + artifactId + "/*/" + artifactId + "-*.*");
+        String groupPath = trimTo(group,"*").replace('.', '/');
+        artifactId = trimTo(artifactId,"*");
+        classifier = trimTo(classifier,"*");
+        extension = trimTo(extension, "jar|zip|war|ear");
+        
+        final Matcher<String> dependencyPathMatcher = AString.matchingAntFilePathPattern("**" +groupPath + "/" + artifactId + "/*/" + artifactId + "-" + classifier + "." + extension);
         
         addMatcher(new AbstractNotNullMatcher<Root>() {
 
@@ -79,6 +130,14 @@ public class ARoot extends PropertyMatcher<Root> {
             }
         });
         return this;
+    }
+    
+    private static String trimTo(String val,String defaultVal){
+    	if(val==null){
+    		return defaultVal;
+    	}
+    	val = val.trim();
+    	return val.length()==0?defaultVal:val;
     }
     
     public ARoot path(String path) {
@@ -240,4 +299,12 @@ public class ARoot extends PropertyMatcher<Root> {
         return this;
     }
 
+    private static class RootMatchBuilderCallback extends AbstractMatchBuilderCallback<Root>{
+
+		@Override
+		protected Matcher<Root> newMatcher(String expression) {
+			return ARoot.with().dependency(expression);
+		}
+    }
+    
 }

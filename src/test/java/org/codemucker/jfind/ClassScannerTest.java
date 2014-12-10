@@ -272,7 +272,7 @@ public class ClassScannerTest {
 		ClassScanner finder = newFinderBuilder()
 			.filter(ClassFilter.with()
 			            .resourceMatches(ARootResource.with().path(AString.matchingAntPattern("**/d/**")))
-			            .classMatches(AClass.that().isNotInner()))
+			            .classMatches(AClass.that().isNotInnerClass()))
 			.build();
 		
 		Collection<Class<?>> found = list(finder.findClasses());

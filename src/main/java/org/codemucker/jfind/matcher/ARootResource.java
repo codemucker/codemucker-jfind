@@ -83,7 +83,7 @@ public class ARootResource extends PropertyMatcher<RootResource> {
 	}
 
 	public ARootResource pathMatchingAntPattern(String antPattern) {
-		path(AString.matchingAntPattern(antPattern));
+		path(AString.matchingAntFilePathPattern(antPattern));
 		return this;
 	}
 
