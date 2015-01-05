@@ -39,15 +39,14 @@ public interface Root {
     /**
      * Return information about the full path of the given relative resource. 
      * 
-     * The returned value does not have to represent a file or url path, it it merely informative for debug and errors messages
+     * The returned value does not have to represent a file or url path if for example this is backed onto a database or archive
      * 
      * @param relPath the relative path of the resource within this root
-     * @return the full path info, not machine readable
+     * @return the full path info which may or may not represent a file path
      */
-    String getFullPathInfo(String relPath);
-    URL getUrl(String relPath);
-    URL toURL();
-    long getLastModified(String relPath);
+    String getResourceFullPath(String relPath);
+    URL getResourceUrl(String relPath);
+    long getResourceLastModified(String relPath);
     
 	/**
 	 * Return a stream to read the given relative stream from
@@ -76,9 +75,9 @@ public interface Root {
 	 * @return
 	 */
 	public boolean canReadResource(String relPath);
-	
-	String getPathName();
 
+	String getFullPath();
+    URL toURL();
 	RootType getType();
 	RootContentType getContentType();
 	RootResource getResource(String relPath);

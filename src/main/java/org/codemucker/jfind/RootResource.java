@@ -91,20 +91,20 @@ public class RootResource  {
 	}
 	
     /**
-     * Return information about the full path of this resource
+     * Return the full path of this resource
      * 
-     * <p>The returned value does not have to represent a file or url path, it is merely informative for debug and errors messages</p>
+     * <p>The returned value does not have to represent a file or url path if it is not file based (as in stored in a db)</p>
      * 
-     * <p>Delegates to {@link Root#getFullPathInfo(String)}</p>
+     * <p>Delegates to {@link Root#getResourceFullPath(String)}</p>
      *  
-     * @return the full path info, not machine readable
+     * @return the full path to this resource
      */
-	public String getFullPathInfo() {
-        return getRoot().getFullPathInfo(relPath);
+	public String getFullPath() {
+        return getRoot().getResourceFullPath(relPath);
     }
     
 	public URL toURL() {
-        return getRoot().getUrl(relPath);
+        return getRoot().getResourceUrl(relPath);
     }
 	
 	public Root getRoot() {
@@ -112,7 +112,7 @@ public class RootResource  {
 	}
 
 	public long getLastModified(){
-	    return root.getLastModified(relPath);
+	    return root.getResourceLastModified(relPath);
 	}
 	
 	public int getDepthFromRoot() {

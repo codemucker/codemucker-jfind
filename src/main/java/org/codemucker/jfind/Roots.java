@@ -308,7 +308,7 @@ public final class Roots  {
 		}
 		
         public Builder root(Root root) {
-            String path = root.getPathName();
+            String path = root.getFullPath();
             if (!roots.containsKey(path) || (root.getType() != RootType.UNKNOWN)) { //always replace UNKNOWN with a  known type
                 roots.put(path, root);
             }

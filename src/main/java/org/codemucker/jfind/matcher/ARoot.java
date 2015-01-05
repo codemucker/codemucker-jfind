@@ -15,7 +15,7 @@ import org.codemucker.jmatch.Matcher;
 import org.codemucker.jmatch.PropertyMatcher;
 import org.codemucker.jmatch.expression.AbstractMatchBuilderCallback;
 import org.codemucker.jmatch.expression.ExpressionParser;
-import org.codemucker.jpattern.Dependency;
+import org.codemucker.jpattern.generate.Dependency;
 
 public class ARoot extends PropertyMatcher<Root> {
 
@@ -117,7 +117,7 @@ public class ARoot extends PropertyMatcher<Root> {
             @Override
             protected boolean matchesSafely(Root actual, MatchDiagnostics diag) {
                 if (actual.getType() == RootType.DEPENDENCY && actual.isArchive()) {
-                    return diag.tryMatch(this, actual.getPathName(), dependencyPathMatcher);
+                    return diag.tryMatch(this, actual.getFullPath(), dependencyPathMatcher);
                 }
                 return true;
             }
@@ -150,7 +150,7 @@ public class ARoot extends PropertyMatcher<Root> {
 
             @Override
             protected boolean matchesSafely(Root actual, MatchDiagnostics diag) {
-                return diag.tryMatch(this, actual.getPathName(), pathMatcher);
+                return diag.tryMatch(this, actual.getFullPath(), pathMatcher);
             }
 
             @Override

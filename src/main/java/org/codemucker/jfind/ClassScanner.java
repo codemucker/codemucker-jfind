@@ -72,7 +72,7 @@ public class ClassScanner {
         checkNotNull(roots, "expect class path roots to search");
         Map<String, Root> map = newLinkedHashMap();
         for (Root root : roots) {
-            String key = root.getPathName();
+            String key = root.getFullPath();
             if ((RootType.UNKNOWN != root.getType()) || !map.containsKey(key)) {
                 map.put(key, root);
             }

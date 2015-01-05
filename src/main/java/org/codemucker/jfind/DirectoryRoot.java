@@ -124,7 +124,7 @@ public class DirectoryRoot implements Root {
 	}
 	
 	@Override
-    public String getFullPathInfo(String relPath){
+    public String getResourceFullPath(String relPath){
         return getByRelPath(relPath).getAbsolutePath();
     }
 	
@@ -135,7 +135,7 @@ public class DirectoryRoot implements Root {
     }
     
 	@Override
-    public URL getUrl(String relPath){
+    public URL getResourceUrl(String relPath){
         try {
             return getByRelPath(relPath).toURI().toURL();
         } catch (MalformedURLException e) {
@@ -144,7 +144,7 @@ public class DirectoryRoot implements Root {
     }
 
     @Override
-    public long getLastModified(String relPath) {
+    public long getResourceLastModified(String relPath) {
         long ts = getByRelPath(relPath).lastModified();
         if (ts <= 0L) {
             ts = Root.TIMESTAMP_NOT_EXIST;
@@ -170,13 +170,9 @@ public class DirectoryRoot implements Root {
 	}
 
     @Override
-    public String getPathName() {
+    public String getFullPath() {
         return PathUtil.toForwardSlashes(baseDir.getAbsolutePath());
     }
-	
-	public File getPath(){
-		return baseDir;
-	}
 	
 	@Override
 	public RootType getType(){
@@ -196,7 +192,7 @@ public class DirectoryRoot implements Root {
 	public String toString(){
 		return Objects
     		.toStringHelper(this)
-    		.add("path", getPathName())
+    		.add("path", getFullPath())
     		.add("type", type)
     		.add("contentType", contentType)
     		.add("isDirectory", baseDir.isDirectory())

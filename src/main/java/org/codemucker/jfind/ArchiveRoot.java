@@ -64,7 +64,7 @@ public class ArchiveRoot implements Root {
 	
 
     @Override
-    public String getFullPathInfo(String relPath) {
+    public String getResourceFullPath(String relPath) {
         return archivePath.getAbsolutePath() + "!" + relPath;
     }
     
@@ -74,7 +74,7 @@ public class ArchiveRoot implements Root {
     }
     
     @Override
-    public URL getUrl(String relPath){
+    public URL getResourceUrl(String relPath){
         try {
             return new URL(archivePath.toURI().toURL().toExternalForm() + "!"  + relPath);
         } catch (MalformedURLException e) {
@@ -83,7 +83,7 @@ public class ArchiveRoot implements Root {
     }
     
     @Override
-    public long getLastModified(String relPath) {
+    public long getResourceLastModified(String relPath) {
         ZipWrapper zip = getZip();
         long ts = zip.getEntry(relPath).getTime();
         if (ts < 0) {
@@ -115,7 +115,7 @@ public class ArchiveRoot implements Root {
 	}
 	
 	@Override
-	public String getPathName(){
+	public String getFullPath(){
 		return PathUtil.toForwardSlashes(archivePath.getAbsolutePath());
 	}
 
@@ -133,7 +133,7 @@ public class ArchiveRoot implements Root {
 	public String toString(){
 		return Objects
     		.toStringHelper(this)
-    		.add("path", getPathName())
+    		.add("path", getFullPath())
     		.add("type", type)
     		.add("contentType", contentType)
     		.add("isArchive", true)
