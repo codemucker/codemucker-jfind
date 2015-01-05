@@ -62,7 +62,7 @@ public class ARoot extends PropertyMatcher<Root> {
     public ARoot dependenciesExpression(String expression) {
     	if(expression != null && expression.trim().length() != 0){
     		Matcher<Root> matcher = ExpressionParser.parse(expression, new RootMatchBuilderCallback());
-    		if(matcher instanceof ARoot){ //make the matching are bit faster by directly running the matchers directly
+    		if(matcher instanceof ARoot){ //make the matching are bit faster by directly running the matchers
     			for(Matcher<Root> m:((ARoot)matcher).getMatchers()){
     				addMatcher(m);
     			}
@@ -80,6 +80,11 @@ public class ARoot extends PropertyMatcher<Root> {
         return this;
     }
     
+    /**
+     * Add a dependency of the form  'group:artifactId:classfier:extension', where any part can be empty or missing (e.g. foo::sources). 
+     * @param mavenDependency
+     * @return
+     */
     public ARoot dependency(String mavenDependency) {
     	String[] parts = mavenDependency.split(":");
     	String group = get(0,parts);
