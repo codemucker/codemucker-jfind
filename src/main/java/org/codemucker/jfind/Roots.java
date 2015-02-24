@@ -47,11 +47,13 @@ public final class Roots  {
 		private boolean includeTestGeneratedSrcDir = false;
 		private boolean includeClasspath = false;
 		
-		private Set<String> archiveTypes = Sets.newHashSet("jar","zip","ear","war");
+		private Set<String> archiveTypes = Sets.newHashSet("jar","zip","ear","war", "nar");
 		private Set<String> ignoreTypes = Sets.newHashSet("so" /* unix libs */);
 
 		private boolean includeMainCompiledDir = false;
-		private boolean includeTestCompiledDir = false;	
+		private boolean includeTestCompiledDir = false;
+
+		private boolean ignoreUnknownRootTypes;	
 		
 		private Builder(){
 			//prevent instantiation outside of builder method
@@ -212,7 +214,7 @@ public final class Roots  {
 		/**
 		 * Add additional file extension types to denote an archive resources (like a jar). E.g. 'jar'
 		 * 
-		 * Default contains jar,zip,war,ear
+		 * Default contains jar,zip,war,ear,nar
 		 * 
 		 * @param extension
 		 * @return
@@ -274,13 +276,28 @@ public final class Roots  {
             return null;
         }
 		
-		public Builder root(File path) {
+        public Builder root(File path){
+        	root(path,false);
+        	return this;
+        }
+        
+        /**
+         * If true silently ignore roots which are not understood (by extension). E.g. a root like /path/to/file.xyz
+         * 
+         * @return this
+         */
+        public Builder ignoreUnknownRootTypes(boolean ignore){
+        	this.ignoreUnknownRootTypes = ignore;
+        	return this;
+        }
+        
+		public Builder root(File path, boolean skipUnknown) {
 			if(path.isFile()){
 				String extension = Files.getFileExtension(path.getName()).toLowerCase();
 				if(archiveTypes.contains(extension)){
 					root(new ArchiveRoot(path,RootType.DEPENDENCY, RootContentType.BINARY));	
 				} else {
-					if(!ignoreTypes.contains(extension)){
+					if(!ignoreUnknownRootTypes && !ignoreTypes.contains(extension)){
 						throw new IllegalArgumentException("Don't currently know how to handle roots with file extension '." + extension + "' (for path '" +path.getAbsolutePath() + "')"); 
 					}
 				}

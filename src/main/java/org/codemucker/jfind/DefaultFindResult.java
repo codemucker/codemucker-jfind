@@ -122,8 +122,12 @@ public class DefaultFindResult<T> implements FindResult<T> {
     }
 
 	@Override
-    public T getFirst() {	
-	    return iterator().next();
+    public T getFirst() {
+		Iterator<T> iterator = iterator();
+		if(iterator.hasNext()){
+			return iterator.next();
+		}
+	    throw new NoSuchElementException("No elements in find result, can't return first");
 	}
 	
 	@Override
