@@ -130,7 +130,7 @@ public class DirectoryRoot implements Root {
 	
     @Override
     public RootResource getResource(String relPath) {
-        validatePath(relPath);
+    	PathUtil.validateIsSafeChildPathOnly(relPath);
         return new RootResource(this, relPath);
     }
     
@@ -153,7 +153,7 @@ public class DirectoryRoot implements Root {
     }
     
 	private File getByRelPath(String relpath) {
-		validatePath(relpath);
+		PathUtil.validateIsSafeChildPathOnly(relpath);
 		if (relpath.charAt(0) != '/') {
 			relpath = '/' + relpath;
 		}
@@ -265,19 +265,6 @@ public class DirectoryRoot implements Root {
 	private static boolean isCancelled(){
 		return Thread.interrupted();
 	}
-
-    private void validatePath(String relPath) {
-        if (relPath == null) {
-            throw new IllegalArgumentException("Invalid relative path. Expected not null");
-        }
-        char c;
-        for (int i = 0; i < relPath.length(); i++) {
-            c = relPath.charAt(i);
-            if (c == '|' || c == ';' || (c == '.' && i + 1 < relPath.length() && relPath.charAt(i + 1) == '.')) {
-                throw new IllegalArgumentException("Invalid relative path '" + relPath + "'");
-            }
-        }
-    }
 
     @Override
     public boolean isArchive() {

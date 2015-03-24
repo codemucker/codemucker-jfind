@@ -65,17 +65,20 @@ public class ArchiveRoot implements Root {
 
     @Override
     public String getResourceFullPath(String relPath) {
-        return archivePath.getAbsolutePath() + "!" + relPath;
+    	PathUtil.validateIsSafeChildPathOnly(relPath);
+    	return archivePath.getAbsolutePath() + "!" + relPath;
     }
     
     @Override
     public RootResource getResource(String relPath){   
+    	PathUtil.validateIsSafeChildPathOnly(relPath);
         return new RootResource(this, relPath);
     }
     
     @Override
     public URL getResourceUrl(String relPath){
         try {
+        	PathUtil.validateIsSafeChildPathOnly(relPath);
             return new URL(archivePath.toURI().toURL().toExternalForm() + "!"  + relPath);
         } catch (MalformedURLException e) {
             throw new JFindException("couldn't convert relative path '" + relPath + "' to url", e);

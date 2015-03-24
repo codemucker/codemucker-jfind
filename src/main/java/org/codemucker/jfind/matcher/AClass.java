@@ -139,6 +139,11 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
     }
     
     public AClass fullName(String fullName){
+        fullName(AString.equalTo(fullName));
+        return this;
+    }
+    
+    public AClass fullNameAntPattern(String fullName){
         fullName(AString.matchingAntPattern(fullName));
         return this;
     }

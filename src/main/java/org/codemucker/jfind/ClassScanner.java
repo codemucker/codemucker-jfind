@@ -223,12 +223,12 @@ public class ClassScanner {
             return filter != null ? filter : new BaseFilter();
         }
 
-        public Builder scanRoots(IBuilder<Iterable<Root>> builder) {
+        public Builder scanRoots(IBuilder<? extends Iterable<? extends Root>> builder) {
             scanRoots(builder.build());
             return this;
         }
 
-        public Builder scanRoots(Iterable<Root> roots) {
+        public Builder scanRoots(Iterable<? extends Root> roots) {
             scanRoots = newArrayList(roots);
             return this;
         }
