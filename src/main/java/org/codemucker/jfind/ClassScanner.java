@@ -193,8 +193,13 @@ public class ClassScanner {
             }
         };
 
+        int numRoots = 0;
         for (Root root : roots) {
-            root.accept(visitor);
+        	numRoots++;
+        	root.accept(visitor);
+        }
+        if(numRoots == 0){
+        	throw new JFindException("No scan roots provided. Expected atleast 1");
         }
         return resources;
     }
