@@ -21,4 +21,8 @@ public class ReflectedMethod extends AbstractReflectedObject {
     public Method getUnderlying(){
         return method;
     }
+    
+    public String getName(){
+    	return method.getName();
+    }
 }
