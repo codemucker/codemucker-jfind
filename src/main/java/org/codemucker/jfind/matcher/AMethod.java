@@ -80,6 +80,31 @@ public class AMethod extends AbstractModiferMatcher<AMethod,Method>{
 		return this;
 	}
 	
+	public AMethod returnType(final Class<?> klass){
+		returnType(klass.getName());
+		return this;
+	}
+	
+	public AMethod returnType(final String fullName){
+		returnType(AString.equalTo(fullName));
+		return this;
+	}
+	
+	public AMethod returnType(final Matcher<String> fullNameMatcher){
+		addMatcher(new AbstractMatcher<Method>() {
+			@Override
+			protected boolean matchesSafely(Method found, MatchDiagnostics diag) {
+				return diag.tryMatch(this, found.getReturnType().getName(), fullNameMatcher);
+			}
+			
+			@Override
+			public void describeTo(Description desc) {
+				desc.value("return type", fullNameMatcher);
+			}
+		});
+		return this;
+	}
+	
 	public AMethod annotation(Class<? extends Annotation> annotation){
         annotation(AnAnnotation.with().fullName(annotation));
         return this;
