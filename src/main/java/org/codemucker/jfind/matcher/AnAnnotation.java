@@ -43,4 +43,19 @@ public class AnAnnotation extends ObjectMatcher<Annotation> {
         });
         return this;
     }
+    
+    public AnAnnotation annotationPresent(final Class<? extends Annotation> annotationPresent) {
+        addMatcher(new AbstractNotNullMatcher<Annotation>() {
+            @Override
+            public boolean matchesSafely(Annotation found, MatchDiagnostics diag) {
+                return found.annotationType().isAnnotationPresent(annotationPresent);
+            }
+
+            @Override
+            public void describeTo(Description desc) {
+                desc.value("annotationPresetn", annotationPresent.getClass().getName());
+            }
+        });
+        return this;
+    }
 }
