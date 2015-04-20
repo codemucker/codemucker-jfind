@@ -50,12 +50,17 @@ public class ReflectedClass extends AbstractReflectedObject {
         return false;
     }
 
+
     public FindResult<Method> findMethodsMatching(Matcher<Method> matcher) {
+    	return findMethodsMatching(matcher,SearchScope.PARENT);
+    }
+    
+    public FindResult<Method> findMethodsMatching(Matcher<Method> matcher, SearchScope scope) {
         List<Method> found = new ArrayList<>();
-        Class<?> t = type;
+        Class<?> currentType = type;
         List<String> visitedMethods = new ArrayList<>();
-        while (t != null && t != Object.class) {
-            for (Method m : t.getDeclaredMethods()) {
+        while (currentType != null && currentType != Object.class) {
+            for (Method m : currentType.getDeclaredMethods()) {
                 if (m.isBridge()) {
                     continue;
                 }
@@ -65,10 +70,9 @@ public class ReflectedClass extends AbstractReflectedObject {
                     if (matcher.matches(m)) {
                         found.add(m);
                     }
-                    ;
                 }
-            }
-            t = t.getSuperclass();
+            };
+            currentType = SearchScope.PARENT.isSet(scope)?currentType.getSuperclass():null;
         }
         return DefaultFindResult.from(found);
     }
