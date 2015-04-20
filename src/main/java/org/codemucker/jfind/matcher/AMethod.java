@@ -105,6 +105,21 @@ public class AMethod extends AbstractModiferMatcher<AMethod,Method>{
 		return this;
 	}
 	
+	public AMethod declaringType(final Matcher<Class<?>> typeMatcher){
+		addMatcher(new AbstractNotNullMatcher<Method>() {
+			@Override
+			public boolean matchesSafely(Method found, MatchDiagnostics diag) {
+				return diag.tryMatch(this, found.getDeclaringClass(), typeMatcher);
+			}
+			
+			@Override
+            public void describeTo(Description desc) {
+                desc.value("with declaring type:", typeMatcher);
+            }
+		});
+		return this;
+	}
+	
 	public AMethod annotation(Class<? extends Annotation> annotation){
         annotation(AnAnnotation.with().fullName(annotation));
         return this;
