@@ -1,5 +1,6 @@
 package org.codemucker.jfind;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +64,16 @@ public interface FindResult<T> extends Iterable<T> {
 	
 	public T getFirstOrNull();
 	
+	FindResult<T> add(Iterable<T> other);
+
+	FindResult<T> sort(Comparator<T> comparator);
+	
 	public static interface KeyProvider<K,V> {
 		public K getKeyFor(V value);
 	}
 	
 	public interface Filter<T> extends Matcher<T>, MatchListener<T>{
 	}
+
+	
 }

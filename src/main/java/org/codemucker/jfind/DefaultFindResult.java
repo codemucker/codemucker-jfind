@@ -4,8 +4,10 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static org.codemucker.lang.Check.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import org.codemucker.jmatch.NullMatchContext;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 public class DefaultFindResult<T> implements FindResult<T> {
 
@@ -59,6 +62,18 @@ public class DefaultFindResult<T> implements FindResult<T> {
 	    super();
 	    this.source = results==null?Collections.EMPTY_LIST:results;
     }
+	
+	@Override
+	public FindResult<T> add(Iterable<T> other){
+		return new DefaultFindResult<>(Iterables.concat(this, other));
+	}
+
+	@Override
+	public FindResult<T> sort(Comparator<T> comparator){
+		List<T> newList = newArrayList(source);
+		Collections.sort(newList,comparator);
+		return new DefaultFindResult<>(newList);
+	}
 
 	@Override
     public Iterator<T> iterator() {
