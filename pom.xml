@@ -13,9 +13,10 @@
 	<name>org.codemucker - JFind</name>
 	<description>test utlity to help you find your classes based on some arbitrary criteria</description>
 	<properties>
-		<xtend.version>2.2.1</xtend.version>
 	</properties>
-
+    <scm>
+       <developerConnection>scm:git:git@github.com/codemucker/codemucker-jfind.git</developerConnection>
+    </scm>
 	<dependencies>
         <dependency>
             <groupId>org.codemucker</groupId>
