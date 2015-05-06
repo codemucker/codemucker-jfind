@@ -18,9 +18,13 @@ import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
 import org.codemucker.jmatch.expression.AbstractMatchBuilderCallback;
 import org.codemucker.jmatch.expression.ExpressionParser;
+import org.codemucker.jmatch.expression.ParseException;
 
 public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 
+	public static final AClass STRING = AClass.with().fullName("java.util.String");
+	public static final AClass BOOL_PRIMITIVE = AClass.with().fullName("boolean");
+	
 	public static final Matcher<Class<?>> MATCHER_ANONYMOUS = new AbstractNotNullMatcher<Class<?>>() {
 		@Override
 		public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
@@ -62,6 +66,17 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 		@Override
         public void describeTo(Description desc) {
             desc.text("is interface");
+        }
+	};
+	
+	public static final Matcher<Class<?>> MATCHER_IS_PRIMITIVE = new AbstractNotNullMatcher<Class<?>>() {
+		@Override
+		public boolean matchesSafely(Class<?> found,MatchDiagnostics diag) {
+			return found.isPrimitive();
+		}
+		@Override
+        public void describeTo(Description desc) {
+            desc.text("is primitve");
         }
 	};
 	
@@ -230,7 +245,17 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
         });
         return this;
     }
-    
+
+	public AClass isNotPrimitve() {
+		addMatcher(Logical.not(MATCHER_IS_PRIMITIVE));
+		return this;
+	}
+
+	public AClass isPrimitve() {
+		addMatcher(MATCHER_IS_PRIMITIVE);
+		return this;
+	}
+	
 	public AClass isPublicConcreteClass() {
 	    isNotAnonymous();
 	    isNotInterface();
@@ -310,10 +335,10 @@ public class AClass extends AbstractModiferMatcher<AClass,Class<?>> {
 				m.invoke(matcher, NO_ARGS);
 			} catch (IllegalAccessException | IllegalArgumentException e) {
 				//should never be thrown
-				throw new ExpressionParser.ParseException("Error calling " + AClass.class.getName() + "." + m.getName() + "() from expression '" + expression + "'",e);
+				throw new ParseException("Error calling " + AClass.class.getName() + "." + m.getName() + "() from expression '" + expression + "'",e);
 			}catch (InvocationTargetException e) {
 				//should never be thrown
-				throw new ExpressionParser.ParseException("Error calling " + AClass.class.getName() + "." + m.getName() + "() from expression '" + expression + "'",e.getTargetException());
+				throw new ParseException("Error calling " + AClass.class.getName() + "." + m.getName() + "() from expression '" + expression + "'",e.getTargetException());
 			}
 			return matcher;
 		}
