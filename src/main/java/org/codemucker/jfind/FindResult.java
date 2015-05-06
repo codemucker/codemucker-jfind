@@ -64,8 +64,18 @@ public interface FindResult<T> extends Iterable<T> {
 	
 	public T getFirstOrNull();
 	
+	/**
+	 * Return a new result with the given items added
+	 * @param other
+	 * @return
+	 */
 	FindResult<T> add(Iterable<T> other);
 
+	/**
+	 * Sort using the given comparator and return a new result
+	 * @param comparator
+	 * @return
+	 */
 	FindResult<T> sort(Comparator<T> comparator);
 	
 	public static interface KeyProvider<K,V> {
