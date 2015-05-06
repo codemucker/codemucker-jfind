@@ -21,22 +21,18 @@
         <dependency>
             <groupId>org.codemucker</groupId>
             <artifactId>codemucker-jtest</artifactId>
-            <version>0.2-SNAPSHOT</version>
-        </dependency>
+            </dependency>
         <dependency>
             <groupId>org.codemucker</groupId>
             <artifactId>codemucker-jpattern</artifactId>
-            <version>0.2-SNAPSHOT</version>
-        </dependency>
+            </dependency>
         <dependency>
             <groupId>org.codemucker</groupId>
             <artifactId>codemucker-lang</artifactId>
-            <version>0.2-SNAPSHOT</version>
-        </dependency>
+            </dependency>
         <dependency>
             <groupId>org.codemucker</groupId>
             <artifactId>codemucker-jmatch</artifactId>
-            <version>0.2-SNAPSHOT</version>
         </dependency>
 		<dependency>
 			<groupId>log4j</groupId>
