@@ -52,7 +52,7 @@ public class ReflectedClass extends AbstractReflectedObject {
 
 
     public FindResult<Method> findMethodsMatching(Matcher<Method> matcher) {
-    	return findMethodsMatching(matcher,SearchScope.PARENT);
+    	return findMethodsMatching(matcher,SearchScope.DIRECT_AND_PARENT);
     }
     
     public FindResult<Method> findMethodsMatching(Matcher<Method> matcher, SearchScope scope) {
