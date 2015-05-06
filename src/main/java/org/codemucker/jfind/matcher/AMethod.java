@@ -2,6 +2,8 @@ package org.codemucker.jfind.matcher;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.codemucker.jfind.ReflectedMethod;
 import org.codemucker.jmatch.AString;
@@ -12,9 +14,20 @@ import org.codemucker.jmatch.Description;
 import org.codemucker.jmatch.Logical;
 import org.codemucker.jmatch.MatchDiagnostics;
 import org.codemucker.jmatch.Matcher;
+import org.codemucker.jpattern.bean.Property;
 
 public class AMethod extends AbstractModiferMatcher<AMethod,Method>{
 
+	private static final Matcher<String> OBJECT_METHOD_NAMES;
+
+	static {
+		Set<String> names = new HashSet<>();
+		for(Method m : Object.class.getMethods()){
+			names.add(m.getName());
+		}
+		OBJECT_METHOD_NAMES = AString.equalToAny(names);
+	}
+	
 	public AMethod() {
 		super(Method.class);
 	}
@@ -22,27 +35,20 @@ public class AMethod extends AbstractModiferMatcher<AMethod,Method>{
 	public static AMethod that(){
 		return with();
 	}
+
 	
 	public static AMethod with(){
 		return new AMethod();
+	}
+	
+	public static Matcher<Method> any(){
+		return Logical.any();
 	}
 	
     @Override
     protected int getModifier(Method instance) {
         return instance.getModifiers();
     }
-	
-	public AMethod isGetter(){
-		name(Logical.any(AString.matchingAntPattern("get*"),AString.matchingAntPattern("is*")));
-		numArgs(0);
-		return this;
-	}
-	
-	public AMethod isSetter(){
-		name("set*");
-		numArgs(AnInt.greaterOrEqualTo(1));
-		return this;
-	}
 	
 	public AMethod name(String nameAntPattern){
 		name(AString.matchingAntPattern(nameAntPattern));
@@ -51,6 +57,50 @@ public class AMethod extends AbstractModiferMatcher<AMethod,Method>{
 	
 	public AMethod name(Matcher<String> matcher){
 		matchProperty("name", String.class, matcher);
+		return this;
+	}
+	
+	public AMethod signature(Matcher<String> matcher){
+		matchProperty("name", String.class, matcher);
+		return this;
+	}
+	
+	public AMethod isNotObjectMethod() {
+		name(Logical.not(OBJECT_METHOD_NAMES));
+		return this;
+	}
+	
+	public AMethod isObjectMethod() {
+		name(OBJECT_METHOD_NAMES);
+		return this;
+	}
+	
+	public AMethod isGetter() {
+		isNotStatic().isNotNative().numArgs(0).isNotVoidReturn();
+		
+		Matcher<Method> nameMatcher = Logical.atLeastOne(
+					AMethod.with().annotation(Property.class), 
+				    AMethod.with()
+						.name(AString.matchingExpression("get?*"))
+						.isPublic(),
+					AMethod.with()
+						.name(AString.matchingExpression("is?*||has?*"))
+						.isPublic()
+						.returnType(AString.equalToAny("boolean","java.lang.Boolean")));
+		
+		addMatcher(nameMatcher);
+		return this;
+	}
+	
+	public AMethod isSetter() {
+		isNotStatic().isNotNative().numArgs(1);
+		Matcher<Method> nameMatcher = Logical.atLeastOne(
+					AMethod.with().annotation(Property.class), 
+				    AMethod.with()
+						.name(AString.matchingExpression("set?*"))
+						.isPublic()
+						.isVoidReturn());
+		addMatcher(nameMatcher);
 		return this;
 	}
 	
