@@ -17,7 +17,12 @@ public abstract class AbstractModiferMatcher<TSelf extends AbstractModiferMatche
     public AbstractModiferMatcher(Class beanClass) {
         super(beanClass);
     }
-
+	
+	public TSelf expression(String expression){
+		withExpression(expression);
+		return self();
+	}
+	
     public TSelf isAbstract() {
         isAbstract(true);
         return self();
