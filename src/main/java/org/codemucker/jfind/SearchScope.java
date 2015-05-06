@@ -6,6 +6,8 @@ public class SearchScope {
 	public static final SearchScope DIRECT = new SearchScope(1<<1);
 	public static final SearchScope CHILDREN = new SearchScope(1<<2);
 	
+
+	public static final SearchScope DIRECT_AND_PARENT = DIRECT.and(PARENT);
 	public static final SearchScope DIRECT_AND_CHILDREN = DIRECT.and(CHILDREN);
 	public static final SearchScope ALL = PARENT.and(DIRECT).and(CHILDREN);
 	
